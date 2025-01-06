@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/eriicafes/tmpl"
+	"github.com/eriicafes/tmplist/db"
 )
 
 type Entry struct {
@@ -14,6 +15,7 @@ type Entry struct {
 func main() {
 	config := getConfig()
 	templates := setupTemplates(!config.Prod)
+	db.Connect(config.DbURL)
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tr := templates.Renderer()
