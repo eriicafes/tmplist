@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classic</title>
+</head>
+
+<body>
+    {{ if .Flash }}
+    <div class="bg-yellow-100 text-yellow-500 border border-yellow-400 p-4 rounded-md mb-8">
+        {{ .Flash }}
+    </div>
+    {{ end }}
+
+    <p>Welcome {{ .User.Email }}</p>
+
+    <ul>
+        <li>
+            <a href="1">Topic 1</a>
+        </li>
+        <li>
+            <a href="2">Topic 2</a>
+        </li>
+        <li>
+            <a href="3">Topic 3</a>
+        </li>
+    </ul>
+</body>
+
+</html>

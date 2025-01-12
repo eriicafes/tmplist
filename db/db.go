@@ -1,14 +1,20 @@
 package db
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
+var (
+	ErrNotFound  = errors.New("not found")
+	ErrDuplicate = errors.New("duplicate")
+)
+
 type DB struct {
-	*sqlx.DB
+	db *sqlx.DB
 }
 
 func Connect(connString string) DB {

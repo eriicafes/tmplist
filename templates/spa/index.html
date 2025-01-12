@@ -5,20 +5,20 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="{{ vite_public " /vite.svg" }}" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{ .Title }}</title>
+  <title>SPA</title>
 
   {{ if eq .File "src/react/index.tsx" }}
   {{ vite_react_refresh }}
   {{ end }}
 
-  {{ vite "src/main.ts" }}
+  {{ vite "src/main.ts" .File }}
 
-  {{ if .File }}
-  <script type="module" src="{{ vite_asset .File }}"></script>
+  {{ if vite_is_dev }}
+  <script type="module">document.body.style.display = "";</script>
   {{ end }}
 </head>
 
-<body>
+<body {{ if vite_is_dev -}} style="display: none;" {{- end }}>
   <header>
     <div
       class="fixed top-0 inset-x-0 flex items-center justify-center gap-4 p-2 bg-zinc-50 font-thin border hover:*:underline">

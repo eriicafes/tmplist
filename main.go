@@ -1,38 +1,35 @@
 package main
 
 import (
-	"log"
 	"net/http"
 
-	"github.com/eriicafes/tmpl"
 	"github.com/eriicafes/tmplist/db"
+	"github.com/eriicafes/tmplist/routes"
+	"github.com/eriicafes/tmplist/services"
 )
-
-type Entry struct {
-	Title, File string
-}
 
 func main() {
 	config := getConfig()
-	templates := setupTemplates(!config.Prod)
-	db.Connect(config.DbURL)
+	templates, vite := setupTemplates(!config.Prod)
+	database := db.Connect(config.DbURL)
+	auth := &services.AuthService{DB: database}
+	session := &services.SessionService{Prod: config.Prod, Auth: auth}
+	rc := routes.Context{
+		Templates: templates,
+		DB:        database,
+		Auth:      auth,
+		Session:   session,
+	}
 
-	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tr := templates.Renderer()
-		spas := map[string]Entry{
-			"react":  {"Tmpl React", "src/react/index.tsx"},
-			"svelte": {"Tmpl Svelte", "src/svelte/index.ts"},
-			"vue":    {"Tmpl Vue", "src/vue/index.ts"},
-		}
-		entry, ok := spas[r.URL.Query().Get("spa")]
-		if !ok {
-			entry = Entry{"Tmpl Vanilla", ""}
-		}
+	mux := http.NewServeMux()
+	// mount routes under prefixes
+	rc.MountClassic(routes.Prefix(mux, "/classic"))
+	rc.MountEnhanced(routes.Prefix(mux, "/enhanced"))
+	rc.MountSpa(routes.Prefix(mux, "/spa"))
+	rc.MountApi(routes.Prefix(mux, "/api"))
 
-		if err := tr.Render(w, tmpl.Tmpl("spa", entry)); err != nil {
-			log.Println(err)
-		}
-	})
-	http.Handle("/", templates.Vite.ServePublic(handler))
-	http.ListenAndServe(config.ListenAddr(), nil)
+	// serve vite static assets
+	mux.Handle("/", vite.ServePublic(http.NotFoundHandler()))
+
+	http.ListenAndServe(config.ListenAddr(), mux)
 }
