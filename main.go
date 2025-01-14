@@ -20,7 +20,7 @@ func main() {
 		Auth:      auth,
 	}
 
-	mux := internal.NewMux(http.DefaultServeMux)
+	mux := internal.Apply(http.DefaultServeMux)
 	// mount routes under prefixes
 	rc.Classic(internal.Prefix(mux, "/classic"))
 	rc.Enhanced(internal.Prefix(mux, "/enhanced"))

@@ -17,12 +17,20 @@ type HandleError interface {
 
 // ErrorHandler returns the error handler func for mux.
 // If mux does not implement the HandleError interface the returned handler func will write a default error response.
-func ErrorHandler(mux Mux, err error) http.HandlerFunc {
+func ErrorHandler(mux ServeMux, err error) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if h, ok := mux.(HandleError); ok {
 			h.HandleError(w, r, err)
 			return
 		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func withErrorHandler(mux ServeMux, handler func(http.ResponseWriter, *http.Request) error) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if err := handler(w, r); err != nil {
+			ErrorHandler(mux, err)(w, r)
+		}
 	}
 }

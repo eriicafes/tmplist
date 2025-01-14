@@ -3,12 +3,12 @@ package internal
 import "net/http"
 
 // Fallback returns a Mux which executes errorHandler when the handler returns a non-nil error.
-func Fallback(mux Mux, errorHandler ErrorHandlerFunc) Mux {
+func Fallback(mux ServeMux, errorHandler ErrorHandlerFunc) Mux {
 	return &fallbackMux{mux, errorHandler}
 }
 
 type fallbackMux struct {
-	Mux
+	ServeMux
 	errorHandler func(http.ResponseWriter, *http.Request, error)
 }
 
@@ -17,9 +17,5 @@ func (fm *fallbackMux) HandleError(w http.ResponseWriter, r *http.Request, err e
 }
 
 func (fm *fallbackMux) Route(pattern string, handler func(http.ResponseWriter, *http.Request) error) {
-	fm.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
-		if err := handler(w, r); err != nil {
-			fm.HandleError(w, r, err)
-		}
-	})
+	fm.Handle(pattern, withErrorHandler(fm, handler))
 }

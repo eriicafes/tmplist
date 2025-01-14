@@ -5,13 +5,13 @@ import (
 	"strings"
 )
 
-// Prefix returns a Mux where routes will be registered under the given prefix.
-func Prefix(mux Mux, prefix string) Mux {
+// Prefix returns a Mux which registers routes with prefix.
+func Prefix(mux ServeMux, prefix string) Mux {
 	return &prefixMux{mux, prefix}
 }
 
 type prefixMux struct {
-	Mux
+	ServeMux
 	prefix string
 }
 
@@ -23,17 +23,13 @@ func (pm *prefixMux) prefixPattern(pattern string) string {
 }
 
 func (pm *prefixMux) Handle(pattern string, handler http.Handler) {
-	pm.Mux.Handle(pm.prefixPattern(pattern), handler)
+	pm.ServeMux.Handle(pm.prefixPattern(pattern), handler)
 }
 
 func (pm *prefixMux) HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request)) {
-	pm.Mux.HandleFunc(pm.prefixPattern(pattern), handler)
+	pm.ServeMux.HandleFunc(pm.prefixPattern(pattern), handler)
 }
 
 func (pm *prefixMux) Route(pattern string, handler func(http.ResponseWriter, *http.Request) error) {
-	pm.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
-		if err := handler(w, r); err != nil {
-			ErrorHandler(pm.Mux, err)(w, r)
-		}
-	})
+	pm.Handle(pattern, withErrorHandler(pm, handler))
 }

@@ -5,14 +5,14 @@ import (
 	"slices"
 )
 
-// Apply returns a Mux where middlewares will be applied to registered routes.
-// Each middleware wraps the next and eventually the handler.
-func Apply(mux Mux, middlewares ...Middleware) Mux {
+// Apply returns a Mux which applies middlewares to the handler.
+// Apply with an empty middlewares list can be used to convert a *http.ServeMux to a Mux.
+func Apply(mux ServeMux, middlewares ...Middleware) Mux {
 	return &applyMux{mux, middlewares}
 }
 
 type applyMux struct {
-	Mux
+	ServeMux
 	middlewares []Middleware
 }
 
@@ -21,7 +21,7 @@ func (am *applyMux) Handle(pattern string, handler http.Handler) {
 	for _, mh := range slices.Backward(am.middlewares) {
 		handler = mh(handler)
 	}
-	am.Mux.Handle(pattern, handler)
+	am.ServeMux.Handle(pattern, handler)
 }
 
 func (am *applyMux) HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request)) {
@@ -29,9 +29,5 @@ func (am *applyMux) HandleFunc(pattern string, handler func(http.ResponseWriter,
 }
 
 func (am *applyMux) Route(pattern string, handler func(http.ResponseWriter, *http.Request) error) {
-	am.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
-		if err := handler(w, r); err != nil {
-			ErrorHandler(am.Mux, err)(w, r)
-		}
-	})
+	am.Handle(pattern, withErrorHandler(am, handler))
 }
