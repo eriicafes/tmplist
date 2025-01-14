@@ -1,1 +1,22 @@
-<p>Layout</p>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Title }}</title>
+    {{ vite "src/main.ts" }}
+    <script type="module">document.body.style.display = ""</script>
+</head>
+
+<body style="display: none;">
+    {{ if .Flash }}
+    <div class="bg-yellow-100 text-yellow-500 border border-yellow-400 p-4 rounded-md mb-8">
+        {{ .Flash.Message }}
+    </div>
+    {{ end }}
+
+    {{ template "content" .Child }}
+</body>
+
+</html>

@@ -1,42 +1,35 @@
 package routes
 
 import (
-	"fmt"
 	"net/http"
 
-	"github.com/eriicafes/tmplist/request"
+	"github.com/eriicafes/tmplist/internal"
 )
 
-func (c Context) authMiddleware() Middleware {
-	return func(handler Handler) Handler {
-		return func(w http.ResponseWriter, r *http.Request) error {
-			rc := c.Session.Authenticate(w, r)
-			_, user := request.User.FromContext(rc.Context())
-			_, session := request.Session.FromContext(rc.Context())
-
-			if !user || !session {
+func (c Context) authMiddleware() internal.Middleware {
+	return func(handler http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			session, user, ok := c.Auth.Authenticate(w, r)
+			if !ok {
 				http.Redirect(w, r, "/classic/login", http.StatusFound)
-				return nil
+				return
 			}
-			return handler(w, rc)
-		}
+			ctx := requestSession.Set(r.Context(), session)
+			ctx = requestUser.Set(ctx, user)
+			handler.ServeHTTP(w, r.WithContext(ctx))
+		})
 	}
 }
 
-func (c Context) guestMiddleware() Middleware {
-	return func(handler Handler) Handler {
-		return func(w http.ResponseWriter, r *http.Request) error {
-			rc := c.Session.Authenticate(w, r)
-			_, user := request.User.FromContext(rc.Context())
-			_, session := request.Session.FromContext(rc.Context())
-
-			fmt.Println(user, session)
-
-			if user || session {
+func (c Context) guestMiddleware() internal.Middleware {
+	return func(handler http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			_, _, ok := c.Auth.Authenticate(w, r)
+			if ok {
 				http.Redirect(w, r, "/classic/", http.StatusFound)
-				return nil
+				return
 			}
-			return handler(w, rc)
-		}
+			handler.ServeHTTP(w, r)
+		})
 	}
 }

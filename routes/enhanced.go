@@ -4,27 +4,28 @@ import (
 	"net/http"
 
 	"github.com/eriicafes/tmpl"
+	"github.com/eriicafes/tmplist/internal"
 )
 
-func (c Context) MountEnhanced(mux Mux) {
-	mux.HandleFunc("/{$}", combine(func(w http.ResponseWriter, r *http.Request) error {
+func (c Context) Enhanced(mux internal.Mux) {
+	mux.Route("/{$}", func(w http.ResponseWriter, r *http.Request) error {
 		tr := c.Renderer()
 		return tr.Render(w, tmpl.Tmpl("enhanced/pages/index"))
-	}))
-	mux.HandleFunc("/{topicId}", combine(func(w http.ResponseWriter, r *http.Request) error {
+	})
+	mux.Route("/{topicId}", func(w http.ResponseWriter, r *http.Request) error {
 		tr := c.Renderer()
 		return tr.Render(w, tmpl.Tmpl("enhanced/pages/topic"))
-	}))
-	mux.HandleFunc("/login", combine(func(w http.ResponseWriter, r *http.Request) error {
+	})
+	mux.Route("/login", func(w http.ResponseWriter, r *http.Request) error {
 		tr := c.Renderer()
 		return tr.Render(w, tmpl.Tmpl("enhanced/pages/login"))
-	}))
-	mux.HandleFunc("/register", combine(func(w http.ResponseWriter, r *http.Request) error {
+	})
+	mux.Route("/register", func(w http.ResponseWriter, r *http.Request) error {
 		tr := c.Renderer()
 		return tr.Render(w, tmpl.Tmpl("enhanced/pages/register"))
-	}))
-	mux.HandleFunc("/", combine(func(w http.ResponseWriter, r *http.Request) error {
+	})
+	mux.Route("/", func(w http.ResponseWriter, r *http.Request) error {
 		tr := c.Renderer()
 		return tr.Render(w, tmpl.Tmpl("enhanced/pages/404"))
-	}))
+	})
 }

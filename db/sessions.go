@@ -12,6 +12,28 @@ type Session struct {
 	ExpiresAt time.Time `db:"expires_at"`
 }
 
+func (s Session) GetExpirestAt() time.Time {
+	return s.ExpiresAt
+}
+
+type SessionStorage struct {
+	DB
+}
+
+func (s SessionStorage) CreateSession(id string, user User, expiresAt time.Time) (Session, error) {
+	session := Session{
+		Id:        id,
+		UserId:    user.Id,
+		ExpiresAt: expiresAt,
+	}
+	return session, s.InsertSession(session)
+}
+
+func (s SessionStorage) UpdateSession(session Session, expiresAt time.Time) (Session, error) {
+	session.ExpiresAt = expiresAt
+	return session, s.DB.UpdateSession(session)
+}
+
 func (d DB) GetSessionAndUser(id string) (Session, User, error) {
 	var s Session
 	var u User

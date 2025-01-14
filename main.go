@@ -4,32 +4,31 @@ import (
 	"net/http"
 
 	"github.com/eriicafes/tmplist/db"
+	"github.com/eriicafes/tmplist/internal"
+	"github.com/eriicafes/tmplist/internal/session"
 	"github.com/eriicafes/tmplist/routes"
-	"github.com/eriicafes/tmplist/services"
 )
 
 func main() {
 	config := getConfig()
 	templates, vite := setupTemplates(!config.Prod)
 	database := db.Connect(config.DbURL)
-	auth := &services.AuthService{DB: database}
-	session := &services.SessionService{Prod: config.Prod, Auth: auth}
+	auth := session.NewAuth(db.SessionStorage{DB: database}, session.Options{Secure: config.Prod})
 	rc := routes.Context{
 		Templates: templates,
 		DB:        database,
 		Auth:      auth,
-		Session:   session,
 	}
 
-	mux := http.NewServeMux()
+	mux := internal.NewMux(http.DefaultServeMux)
 	// mount routes under prefixes
-	rc.MountClassic(routes.Prefix(mux, "/classic"))
-	rc.MountEnhanced(routes.Prefix(mux, "/enhanced"))
-	rc.MountSpa(routes.Prefix(mux, "/spa"))
-	rc.MountApi(routes.Prefix(mux, "/api"))
+	rc.Classic(internal.Prefix(mux, "/classic"))
+	rc.Enhanced(internal.Prefix(mux, "/enhanced"))
+	rc.Spa(internal.Prefix(mux, "/spa"))
+	rc.Api(internal.Prefix(mux, "/api"))
 
 	// serve vite static assets
 	mux.Handle("/", vite.ServePublic(http.NotFoundHandler()))
 
-	http.ListenAndServe(config.ListenAddr(), mux)
+	http.ListenAndServe(config.ListenAddr(), nil)
 }

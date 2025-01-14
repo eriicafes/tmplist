@@ -1,16 +1,18 @@
 package classic_pages
 
 import (
-	"github.com/eriicafes/tmplist/httperrors"
+	"github.com/eriicafes/tmpl"
+	"github.com/eriicafes/tmplist/internal/httperrors"
 	"github.com/eriicafes/tmplist/schemas"
 )
 
 type Register struct {
+	Layout
 	Form   schemas.RegisterData
 	Error  string
 	Errors httperrors.Details
 }
 
-func (l Register) Template() (string, any) {
-	return "classic/pages/register", l
+func (r Register) Template() (string, any) {
+	return tmpl.Tmpl("classic/pages/register", r.Layout, r).Template()
 }

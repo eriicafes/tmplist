@@ -1,7 +1,7 @@
 package schemas
 
 import (
-	"github.com/eriicafes/tmplist/httperrors"
+	"github.com/eriicafes/tmplist/internal/httperrors"
 	v "github.com/go-ozzo/ozzo-validation/v4"
 )
 
