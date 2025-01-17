@@ -1,3 +1,5 @@
+// Package session implements session based authentication
+// as detailed in Lucia Auth guide https://lucia-auth.com/sessions/cookies/.
 package session
 
 import (
@@ -18,7 +20,7 @@ var ErrSessionExpired = errors.New("session expired")
 // Auth provides the useful methods for working with user sessions.
 type Auth[S SessionObject, U any] struct {
 	storage Storage[S, U]
-	options Options
+	options SessionOptions
 }
 
 type Storage[S SessionObject, U any] interface {
@@ -30,24 +32,31 @@ type Storage[S SessionObject, U any] interface {
 
 type SessionObject interface{ GetExpirestAt() time.Time }
 
-type Options struct {
-	// Cookie is the session cookie name. Default is "auth_session".
-	Cookie string
-
-	// Duration is the session duration. Default is 30 days.
+type SessionOptions struct {
+	// Duration configures the session duration, default is 30 days.
 	Duration time.Duration
 
-	// Secure sends cookies over HTTPS only. Default is false.
-	Secure bool
+	// Cookie configures the cookie name, default is "auth_session".
+	Cookie string
+
+	// Other cookie options
+
+	SameSite http.SameSite // default is http.SameSiteLaxMode
+	Secure   bool          // default is false
+	Path     string        // optional
+	Domain   string        // optional
 }
 
 // New returns a new auth provider.
-func NewAuth[S SessionObject, U any](storage Storage[S, U], options Options) *Auth[S, U] {
+func NewAuth[S SessionObject, U any](storage Storage[S, U], options SessionOptions) *Auth[S, U] {
+	if options.Duration == 0 {
+		options.Duration = time.Hour * 24 * 30 // 30 days
+	}
 	if options.Cookie == "" {
 		options.Cookie = "auth_session"
 	}
-	if options.Duration == 0 {
-		options.Duration = time.Hour * 24 * 30
+	if options.SameSite == 0 {
+		options.SameSite = http.SameSiteLaxMode
 	}
 	return &Auth[S, U]{storage, options}
 }
@@ -88,11 +97,13 @@ func (a *Auth[S, U]) GetCookie(r *http.Request) (string, bool) {
 func (a *Auth[S, U]) SetCookie(w http.ResponseWriter, token string, expiresAt time.Time) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     a.options.Cookie,
-		HttpOnly: true,
-		Secure:   a.options.Secure,
-		SameSite: http.SameSiteLaxMode,
 		Value:    token,
 		Expires:  expiresAt.UTC(),
+		HttpOnly: true,
+		SameSite: a.options.SameSite,
+		Secure:   a.options.Secure,
+		Path:     a.options.Path,
+		Domain:   a.options.Domain,
 	})
 }
 
@@ -101,9 +112,11 @@ func (a *Auth[S, U]) DeleteCookie(w http.ResponseWriter) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     a.options.Cookie,
 		HttpOnly: true,
-		Secure:   a.options.Secure,
-		SameSite: http.SameSiteLaxMode,
 		MaxAge:   -1,
+		SameSite: a.options.SameSite,
+		Secure:   a.options.Secure,
+		Path:     a.options.Path,
+		Domain:   a.options.Domain,
 	})
 }
 
@@ -125,9 +138,9 @@ func (a *Auth[S, U]) CreateSession(token string, user U) (S, error) {
 	return a.storage.CreateSession(hashedToken, user, time.Now().Add(a.options.Duration))
 }
 
-// ValidateSessionToken validates a session token and returns the session and user.
-// ValidateSessionToken may update the session's expiresAt timestamp so make sure to set new cookies.
-// ValidateSessionToken also deletes expired sessions.
+// ValidateSessionToken validates a session token corresponds to a session in storage and is not expired.
+// Sessions that are halfway past their expiration date but not yet expired will be refreshed.
+// Expired sessions will be deleted and an ErrSessionExpired will be returned.
 func (a *Auth[S, U]) ValidateSessionToken(token string) (S, U, error) {
 	hashedToken := hashSessionToken([]byte(token))
 	// get session from db

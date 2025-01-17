@@ -9,6 +9,7 @@ import (
 func (c Context) authMiddleware() internal.Middleware {
 	return func(handler http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// TODO: prevent non GET cross-subdomain requests
 			session, user, ok := c.Auth.Authenticate(w, r)
 			if !ok {
 				http.Redirect(w, r, "/classic/login", http.StatusFound)
