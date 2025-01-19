@@ -13,14 +13,17 @@ func main() {
 	config := getConfig()
 	templates, vite := setupTemplates(!config.Prod)
 	database := db.Connect(config.DbURL)
-	auth := session.NewAuth(db.SessionStorage{DB: database}, session.Options{Secure: config.Prod})
+	auth := session.NewAuth(
+		db.SessionStorage{DB: database},
+		session.SessionOptions{Secure: config.Prod},
+	)
 	rc := routes.Context{
 		Templates: templates,
 		DB:        database,
 		Auth:      auth,
 	}
 
-	mux := internal.Apply(http.DefaultServeMux)
+	mux := internal.Use(http.DefaultServeMux)
 	// mount routes under prefixes
 	rc.Classic(internal.Prefix(mux, "/classic"))
 	rc.Enhanced(internal.Prefix(mux, "/enhanced"))
