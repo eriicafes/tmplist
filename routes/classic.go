@@ -19,8 +19,8 @@ var flashMessage session.Flash[classic_pages.FlashMessage] = "flash_message"
 
 func (c Context) Classic(mux internal.Mux) {
 	mux = internal.Fallback(mux, c.ClassicErrorHandler())
-	auth := internal.Apply(mux, c.authMiddleware())
-	guest := internal.Apply(mux, c.guestMiddleware())
+	auth := internal.Use(mux, c.authMiddleware())
+	guest := internal.Use(mux, c.guestMiddleware())
 
 	// all topics page
 	auth.Route("GET /{$}", func(w http.ResponseWriter, r *http.Request) error {
@@ -61,6 +61,11 @@ func (c Context) Classic(mux internal.Mux) {
 
 	// login post
 	guest.Route("POST /login", func(w http.ResponseWriter, r *http.Request) error {
+		// prevent other origins from authenticating the user
+		if !c.allowOriginForNonSafeRequests(r) {
+			return httperrors.New("Login attempt from an unknown site blocked", http.StatusForbidden)
+		}
+
 		tr := c.Renderer()
 
 		// validate input
@@ -126,6 +131,11 @@ func (c Context) Classic(mux internal.Mux) {
 
 	// register post
 	guest.Route("POST /register", func(w http.ResponseWriter, r *http.Request) error {
+		// prevent other origins from authenticating the user
+		if !c.allowOriginForNonSafeRequests(r) {
+			return httperrors.New("Register attempt from an unknown site blocked", http.StatusForbidden)
+		}
+
 		tr := c.Renderer()
 
 		// validate input
