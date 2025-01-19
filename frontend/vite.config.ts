@@ -10,6 +10,7 @@ export default defineConfig({
     rollupOptions: {
       input: [
         "src/main.ts",
+        "src/main.css",
         "src/react/index.tsx",
         "src/vue/index.ts",
         "src/svelte/index.ts",

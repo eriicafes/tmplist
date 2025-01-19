@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ .Title }}</title>
     {{ vite "src/main.ts" }}
-    <script type="module">document.body.style.display = ""</script>
+    <link rel="stylesheet" href="{{ vite_asset " src/main.css"}}">
 </head>
 
-<body style="display: none;">
+<body>
     {{ if .Flash }}
     <div class="bg-yellow-100 text-yellow-500 border border-yellow-400 p-4 rounded-md mb-8">
         {{ .Flash.Message }}
