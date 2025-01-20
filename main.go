@@ -33,5 +33,6 @@ func main() {
 	// serve vite static assets
 	mux.Handle("/", vite.ServePublic(http.NotFoundHandler()))
 
-	http.ListenAndServe(config.ListenAddr(), nil)
+	h := internal.RewriteTrailingSlash(http.DefaultServeMux)
+	http.ListenAndServe(config.ListenAddr(), h)
 }

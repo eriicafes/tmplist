@@ -1,14 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
+{{ template "classic/pages/layout" . }}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ .Title }}</title>
-</head>
-
-<body>
-    <p>{{ .Title }}</p>
-</body>
-
-</html>
+{{ define "content" }}
+<section class="max-w-2xl mx-auto mt-24 p-8">
+    <h1 class="mb-4">
+        <span class="font-light">{{ .Title }}</span>
+    </h1>
+</section>
+{{ end }}

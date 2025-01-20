@@ -23,7 +23,7 @@ func (c Context) Classic(mux internal.Mux) {
 	guest := internal.Use(mux, c.guestMiddleware())
 
 	// all topics page
-	auth.Route("GET /{$}", func(w http.ResponseWriter, r *http.Request) error {
+	auth.Route("GET ", func(w http.ResponseWriter, r *http.Request) error {
 		tr := c.Renderer()
 
 		user, _ := requestUser.Get(r.Context())
