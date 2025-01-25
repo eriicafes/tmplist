@@ -2,8 +2,6 @@ package db
 
 import (
 	"time"
-
-	"github.com/lib/pq"
 )
 
 type Topic struct {
@@ -11,17 +9,38 @@ type Topic struct {
 	UserId    int       `db:"user_id"`
 	Title     string    `db:"title"`
 	CreatedAt time.Time `db:"created_at"`
+
+	// Aggregated fields
+
+	TodosCount int `db:"todos_count"`
+}
+
+func (t Topic) FormatCreatedAt() string {
+	return t.CreatedAt.Format("Jan _2, 2006")
 }
 
 func (d DB) GetTopics(userId int) ([]Topic, error) {
 	var topics []Topic
-	err := d.db.Select(&topics, `select * from topics where user_id = $1`, userId)
+	err := d.db.Select(&topics, `
+	select topics.*, count(todos.topic_id) as todos_count
+	from topics
+	left join todos on todos.topic_id = topics.id
+	where user_id = $1
+	group by topics.id
+	order by topics.id desc
+	`, userId)
 	return topics, err
 }
 
 func (d DB) GetTopic(id int) (Topic, error) {
 	var topic Topic
-	err := d.db.Get(&topic, `select * from topics where id = $1`, id)
+	err := d.db.Get(&topic, `
+	select topics.*, count(todos.topic_id) as todos_count
+	from topics
+	left join todos on todos.topic_id = topics.id
+	where topics.id = $1
+	group by topics.id
+	`, id)
 	return topic, err
 }
 
@@ -29,11 +48,6 @@ func (d DB) InsertTopic(userId int, title string) (Topic, error) {
 	var topic Topic
 	err := d.db.Get(&topic, `insert into topics (user_id, title) values ($1, $2) returning *`, userId, title)
 	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok {
-			if pqErr.Code.Name() == "foreign_key_violation" {
-				return topic, ErrDuplicate
-			}
-		}
 		return topic, err
 	}
 	return topic, nil

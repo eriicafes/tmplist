@@ -1,0 +1,10 @@
+<div class="group flex items-center gap-1 text-sm text-zinc-400 border-y border-transparent focus-within:border-zinc-700 hover:border-zinc-700 transition-colors">
+    <div class="size-5 flex items-center justify-center">
+        <input name="todo-checked" type="checkbox" {{if .checked}}checked{{end}} onchange="this.nextElementSibling.toggleAttribute('disabled')" class="size-4 appearance-none checked:appearance-auto border-2 border-zinc-600 accent-sky-200 rounded-xs focus:outline-none">
+        <input name="todo-checked" type="hidden" value="off" {{if .checked}}disabled{{end}} />
+    </div>
+    <input name="todo" required type="text" value="{{.value}}" {{if .autofocus}}autofocus{{end}} class="flex-1 px-2 h-10 focus:outline-none">
+    <button {{if .deleteAction}}formaction="{{.deleteAction}}"{{else}}type="button"{{end}} class="rounded-full p-1 hidden group-focus-within:block hover:bg-zinc-700 hover:text-zinc-300 transition-colors">
+        {{ template "components/icons/x" map "class" "size-4 stroke-1" }}
+    </button>
+</div>

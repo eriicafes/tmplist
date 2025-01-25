@@ -33,7 +33,7 @@ func (c Context) guestMiddleware() internal.Middleware {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			_, _, ok := c.Auth.Authenticate(w, r)
 			if ok {
-				http.Redirect(w, r, "/classic/", http.StatusFound)
+				http.Redirect(w, r, "/classic", http.StatusFound)
 				return
 			}
 			handler.ServeHTTP(w, r)
@@ -49,7 +49,13 @@ func (c Context) allowOriginForNonSafeRequests(r *http.Request) bool {
 		// skip for safe methods
 		return true
 	default:
-		origin, err := url.Parse(r.Header.Get("Origin"))
+		originStr := r.Header.Get("Origin")
+		// origin might be missing if the request is from a different client
+		// browsers would always include the header
+		if originStr == "" {
+			return true
+		}
+		origin, err := url.Parse(originStr)
 		if err != nil {
 			return false
 		}

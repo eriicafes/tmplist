@@ -1,35 +1,38 @@
 {{ template "classic/pages/layout" . }}
 
 {{ define "content" }}
-<section class="max-w-xl mx-auto mt-24 bg-zinc-100 p-8 rounded-xl">
+<section class="max-w-xl mx-auto text-sm">
     <div class="mb-4">
         <p class="text-2xl font-medium mb-2">Register an account</p>
         <p class="font-light">Enter email address and password to create an account.</p>
     </div>
 
-    <form method="POST" class="grid gap-4">
+    <form method="post" class="grid gap-4">
         <div class="grid gap-1">
             <label class="text-zinc-500 px-1">Email</label>
             <input type="text" name="email" placeholder="Your email address" value="{{ .Form.Email }}"
-                class="border h-12 w-full rounded-md px-3">
+                class="border h-12 w-full rounded-md px-3 bg-transparent border-zinc-700 focus:border-zinc-400 focus:outline-none">
             {{ if .Errors.Email }}
             <p class="text-red-500 px-1">{{ .Errors.Email }}</p>
             {{ end }}
         </div>
+
         <div class="grid gap-1">
             <label class="text-zinc-500 px-1">Password</label>
             <input type="password" name="password" placeholder="Your password"
-                class="border h-12 w-full rounded-md px-3">
+                class="border h-12 w-full rounded-md px-3 bg-transparent border-zinc-700 focus:border-zinc-400 focus:outline-none">
             {{ if .Errors.Password }}
             <p class="text-red-500 px-1">{{ .Errors.Password }}</p>
             {{ end }}
         </div>
 
         {{ if .Error }}
-        <p class="text-red-500 px-1 text-center">{{ .Error }}</p>
+        {{ template "components/toast" map "type" "error" "text" .Error }}
         {{ end }}
 
-        <button class="bg-zinc-800 text-white p-4 rounded-md">Create account</button>
+        <div class="grid pt-4 border-t border-zinc-700">
+            <button class="bg-sky-200 text-zinc-800 font-semibold h-12 rounded-md">Create account</button>
+        </div>
 
         <p class="text-center">Already have an account? <a class="font-medium underline" href="/classic/login">Login</a>
         </p>

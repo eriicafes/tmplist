@@ -16,4 +16,5 @@ type Context struct {
 	tmpl.Templates
 	DB   db.DB
 	Auth *session.Auth[db.Session, db.User]
+	Prod bool
 }

@@ -111,8 +111,8 @@ func (a *Auth[S, U]) SetCookie(w http.ResponseWriter, token string, expiresAt ti
 func (a *Auth[S, U]) DeleteCookie(w http.ResponseWriter) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     a.options.Cookie,
-		HttpOnly: true,
 		MaxAge:   -1,
+		HttpOnly: true,
 		SameSite: a.options.SameSite,
 		Secure:   a.options.Secure,
 		Path:     a.options.Path,

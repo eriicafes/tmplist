@@ -2,21 +2,19 @@ package db
 
 import (
 	"time"
-
-	"github.com/lib/pq"
 )
 
 type Todo struct {
 	Id        int       `db:"id"`
-	TopicId   int       `db:"topid_id"`
+	TopicId   int       `db:"topic_id"`
 	Body      string    `db:"body"`
 	Done      bool      `db:"done"`
 	CreatedAt time.Time `db:"created_at"`
 }
 
-func (d DB) GetItems(topicId string) ([]Todo, error) {
+func (d DB) GetTodos(topicId int) ([]Todo, error) {
 	var todos []Todo
-	err := d.db.Select(&todos, `select * from todos where topic_id = $1`, topicId)
+	err := d.db.Select(&todos, `select * from todos where topic_id = $1 order by id desc`, topicId)
 	return todos, err
 }
 
@@ -26,18 +24,12 @@ func (d DB) GetTodo(id int) (Todo, error) {
 	return todo, err
 }
 
-func (d DB) InsertTodo(topicId int, body string) (Todo, error) {
-	var todo Todo
-	err := d.db.Get(&todo, `insert into todos (topic_id, body) values ($1, $2) returning *`, topicId, body)
+func (d DB) InsertTodos(todos []Todo) (int64, error) {
+	result, err := d.db.NamedExec(`insert into todos (topic_id, body, done) values (:topic_id, :body, :done)`, todos)
 	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok {
-			if pqErr.Code.Name() == "foreign_key_violation" {
-				return todo, ErrDuplicate
-			}
-		}
-		return todo, err
+		return 0, err
 	}
-	return todo, nil
+	return result.RowsAffected()
 }
 
 func (d DB) UpdateTodo(id int, body string, done bool) (Todo, error) {

@@ -1,10 +1,22 @@
 package classic_pages
 
-type FlashMessage struct {
+import "github.com/eriicafes/tmplist/db"
+
+type toastType string
+
+var (
+	ToastWarning = toastType("warning")
+	ToastError   = toastType("error")
+	ToastSuccess = toastType("success")
+)
+
+type Toast struct {
 	Message string
-	Success bool
+	Type    toastType
 }
 
 type Layout struct {
-	Flash FlashMessage
+	Toast Toast
+	Title string
+	User  *db.User
 }

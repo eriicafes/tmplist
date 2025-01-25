@@ -3,54 +3,16 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="{{ vite_public " /vite.svg" }}" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SPA</title>
-
-  {{ if eq .File "src/react/index.tsx" }}
+  <link rel="icon" type="image/svg+xml" href="{{ vite_public "/vite.svg" }}" />
+  <title>Tmplist</title>
   {{ vite_react_refresh }}
-  {{ end }}
-
-  {{ vite "src/main.ts" .File }}
-
-  {{ if vite_is_dev }}
-  <script type="module">document.body.style.display = "";</script>
-  {{ end }}
+  {{ vite "src/react/index.tsx" }}
+  <link rel="stylesheet" href="{{ vite_asset "src/main.css"}}">
 </head>
 
-<body {{ if vite_is_dev -}} style="display: none;" {{- end }}>
-  <header>
-    <div
-      class="fixed top-0 inset-x-0 flex items-center justify-center gap-4 p-2 bg-zinc-50 font-thin border hover:*:underline">
-      <a href="?spa=vanilla">Vanilla</a>
-      <a href="?spa=react">React</a>
-      <a href="?spa=vue">Vue</a>
-      <a href="?spa=svelte">Svelte</a>
-    </div>
-  </header>
-
-  <div id="app">
-    <div
-      class="max-w-sm mx-auto mt-40 flex items-center justify-between p-4 rounded-xl bg-gray-50 text-gray-500 font-thin border">
-      <p>Vanilla</p>
-      <span id="count">0</span>
-      <button class="text-xl" id="increment">+</button>
-
-      <script>
-        function setupCounter(triggerEl, targetEl) {
-          let count = 0
-          targetEl.innerText = count
-          triggerEl.addEventListener("click", () => {
-            targetEl.innerText = ++count
-          })
-        }
-        setupCounter(
-          document.getElementById("increment"),
-          document.getElementById("count"),
-        )
-      </script>
-    </div>
-  </div>
+<body>
+  <div id="app"></div>
 </body>
 
 </html>

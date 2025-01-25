@@ -15,12 +15,13 @@ func main() {
 	database := db.Connect(config.DbURL)
 	auth := session.NewAuth(
 		db.SessionStorage{DB: database},
-		session.SessionOptions{Secure: config.Prod},
+		session.SessionOptions{Secure: config.Prod, Path: "/"},
 	)
 	rc := routes.Context{
 		Templates: templates,
 		DB:        database,
 		Auth:      auth,
+		Prod:      config.Prod,
 	}
 
 	mux := internal.Use(http.DefaultServeMux)

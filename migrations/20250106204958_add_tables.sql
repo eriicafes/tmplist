@@ -22,7 +22,7 @@ create table topics (
     foreign key (user_id) references users(id) on delete cascade
 );
 
-create table items (
+create table todos (
     id serial primary key,
     topic_id integer not null,
     body text not null,

@@ -32,7 +32,7 @@ import (
 // with a slash because such URLs will be matched with the non-trailing slash handler.
 func RewriteTrailingSlash(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !strings.HasSuffix(r.URL.Path, "/") {
+		if r.URL.Path == "/" || !strings.HasSuffix(r.URL.Path, "/") {
 			handler.ServeHTTP(w, r)
 			return
 		}
