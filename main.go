@@ -24,8 +24,9 @@ func main() {
 		Prod:      config.Prod,
 	}
 
-	mux := internal.Use(http.DefaultServeMux)
-	// mount routes under prefixes
+	mux := http.NewServeMux()
+	rc.Settings(mux)
+	// mount mode routes under prefixes
 	rc.Classic(internal.Prefix(mux, "/classic"))
 	rc.Enhanced(internal.Prefix(mux, "/enhanced"))
 	rc.Spa(internal.Prefix(mux, "/spa"))
@@ -34,6 +35,6 @@ func main() {
 	// serve vite static assets
 	mux.Handle("/", vite.ServePublic(http.NotFoundHandler()))
 
-	h := internal.RewriteTrailingSlash(http.DefaultServeMux)
+	h := internal.RewriteTrailingSlash(mux)
 	http.ListenAndServe(config.ListenAddr(), h)
 }

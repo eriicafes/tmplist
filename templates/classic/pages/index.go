@@ -8,6 +8,7 @@ import (
 type Index struct {
 	Layout
 	Topics []db.Topic
+	Search string
 }
 
 func (i Index) Template() (string, any) {

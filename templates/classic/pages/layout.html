@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="{{ vite_public "/vite.svg" }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <title>
         {{ with .Data.Title }}
         {{ printf "%s | " . }}
@@ -12,20 +15,20 @@
         Tmplist
     </title>
     {{ vite "src/vanilla/index.ts" }}
-    <link rel="stylesheet" href="{{ vite_asset "src/main.css"}}">
+    <link rel="stylesheet" href="{{ vite_asset "src/main.css" }}">
     {{ block "script" .}}{{ end }}
 </head>
 
-<body class="bg-zinc-800 text-white">
+<body class="bg-zinc-800 text-white font-inter">
     <header class="fixed top-0 inset-x-0 z-50 bg-zinc-800 border-b border-zinc-900">
         <div class="flex items-center justify-between px-4 py-2">
             <div class="flex items-center gap-1">
                 <a href="/classic" class="font-semibold tracking-wide text-lg">
                     Tmplist
                 </a>
-                <button class="border rounded-full px-2 py-px text-[9px] uppercase" type="button">
+                <a href="/" class="border rounded-full px-2 py-px text-[9px] uppercase" type="button">
                     Classic
-                </button>
+                </a>
             </div>
 
             <div class="flex items-center gap-2">
@@ -72,11 +75,12 @@
                     {{ template "components/icons/x" map "class" "size-5 stroke-1"}}
                 </button>
             </div>
-            <form class="grid gap-4">
+            <form method="post" action="/" class="grid gap-4">
                 <div class="grid gap-1">
                     <label class="font-medium text-zinc-400 text-[10px]">Mode</label>
                     <div class="rounded-xl border border-zinc-600 focus-within:border-zinc-400 px-2">
-                        <select class="w-full text-xs bg-transparent h-9 focus:outline-none">
+                        <select name="mode" class="w-full text-xs bg-transparent h-9 focus:outline-none">
+                            <option value="none">None</option>
                             <option value="classic">Classic</option>
                             <option value="enhanced">Enhanced</option>
                             <option value="spa">SPA</option>
@@ -86,7 +90,7 @@
                 <div class="grid gap-1">
                     <label class="font-medium text-zinc-400 text-[10px]">Latency</label>
                     <div class="rounded-xl border border-zinc-600 focus-within:border-zinc-400 px-2">
-                        <select class="w-full text-xs bg-transparent h-9 focus:outline-none">
+                        <select name="delay" class="w-full text-xs bg-transparent h-9 focus:outline-none">
                             <option value="normal">Normal</option>
                             <option value="slow">Slow</option>
                             <option value="very-slow">Very Slow</option>

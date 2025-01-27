@@ -7,11 +7,11 @@
 {{ define "content" }}
 <section>
     <div class="mb-4 h-7 flex items-center justify-between flex-wrap leading-none">
-        <a href="/classic" class="font-medium hover:underline underline-offset-4">&larr; Back to topics</a>
-        <p class="text-zinc-300 text-sm">{{ .Layout.User.Email }}</p>
+        <a href="/classic" class="text-sm text-zinc-300 hover:text-zinc-100">&larr; Back to topics</a>
+        <p class="text-sm text-zinc-300">{{ .Layout.User.Email }}</p>
     </div>
     
-    <div class="max-w-3xl mx-auto bg-zinc-800 borders border-zinc-700 rounded-xl p-4">
+    <div class="max-w-3xl mx-auto py-4 bg-zinc-800 borders border-zinc-700 rounded-xl">
         <form id="topic-delete-form" method="post" action="/classic/{{.Topic.Id}}/delete"></form>
         <div id="form-container" class="grid">
             <form id="topic-form" method="post" action="/classic/{{.Topic.Id}}" class="flex items-start gap-1">

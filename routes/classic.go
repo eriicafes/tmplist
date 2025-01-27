@@ -34,20 +34,20 @@ func (c Context) Classic(mux internal.Mux) {
 
 	// all topics page
 	auth.Route("GET ", func(w http.ResponseWriter, r *http.Request) error {
-		tr := c.Renderer()
-
 		user, _ := requestUser.Get(r.Context())
+		search := r.FormValue("search")
 
 		// get topics from db
-		topics, _ := c.DB.GetTopics(user.Id)
+		topics, _ := c.DB.GetTopics(user.Id, search)
 
-		return tr.Render(w, classic_pages.Index{
+		return c.Render(w, classic_pages.Index{
 			Layout: classic_pages.Layout{
 				Toast: toastMessage.Get(w, r),
 				Title: "Topics",
 				User:  &user,
 			},
 			Topics: topics,
+			Search: search,
 		})
 	})
 
@@ -118,8 +118,6 @@ func (c Context) Classic(mux internal.Mux) {
 
 	// topic page
 	auth.Route("GET /{topicId}", func(w http.ResponseWriter, r *http.Request) error {
-		tr := c.Renderer()
-
 		user, _ := requestUser.Get(r.Context())
 		topicId, _ := strconv.Atoi(r.PathValue("topicId"))
 
@@ -135,7 +133,7 @@ func (c Context) Classic(mux internal.Mux) {
 			log.Println(err)
 		}
 
-		return tr.Render(w, classic_pages.Topic{
+		return c.Render(w, classic_pages.Topic{
 			Layout: classic_pages.Layout{
 				Toast: toastMessage.Get(w, r),
 				Title: topic.Title,
@@ -353,7 +351,7 @@ func (c Context) Classic(mux internal.Mux) {
 
 	// login page
 	guest.Route("GET /login", func(w http.ResponseWriter, r *http.Request) error {
-		return c.Renderer().Render(w, classic_pages.Login{
+		return c.Render(w, classic_pages.Login{
 			Layout: classic_pages.Layout{
 				Title: "Login",
 			},
@@ -367,15 +365,13 @@ func (c Context) Classic(mux internal.Mux) {
 			return httperrors.New("Login attempt from an unknown site blocked", http.StatusForbidden)
 		}
 
-		tr := c.Renderer()
-
 		// validate input
 		form := schemas.LoginData{
 			Email:    r.PostFormValue("email"),
 			Password: r.PostFormValue("password"),
 		}
 		renderError := func(message string, details httperrors.Details) error {
-			return tr.Render(w, classic_pages.Login{
+			return c.Render(w, classic_pages.Login{
 				Layout: classic_pages.Layout{
 					Title: "Login",
 				},
@@ -396,7 +392,7 @@ func (c Context) Classic(mux internal.Mux) {
 		}
 		// check password
 		if !c.Auth.ComparePassword(user.PasswordHash, form.Password) {
-			return tr.Render(w, classic_pages.Login{
+			return c.Render(w, classic_pages.Login{
 				Layout: classic_pages.Layout{
 					Title: "Login",
 				},
@@ -422,7 +418,7 @@ func (c Context) Classic(mux internal.Mux) {
 
 	// register page
 	guest.Route("GET /register", func(w http.ResponseWriter, r *http.Request) error {
-		return c.Renderer().Render(w, classic_pages.Register{
+		return c.Render(w, classic_pages.Register{
 			Layout: classic_pages.Layout{
 				Title: "Register",
 			},
@@ -436,15 +432,13 @@ func (c Context) Classic(mux internal.Mux) {
 			return httperrors.New("Register attempt from an unknown site blocked", http.StatusForbidden)
 		}
 
-		tr := c.Renderer()
-
 		// validate input
 		form := schemas.RegisterData{
 			Email:    r.PostFormValue("email"),
 			Password: r.PostFormValue("password"),
 		}
 		renderError := func(message string, details httperrors.Details) error {
-			return tr.Render(w, classic_pages.Register{
+			return c.Render(w, classic_pages.Register{
 				Layout: classic_pages.Layout{
 					Title: "Login",
 				},
@@ -517,7 +511,7 @@ func (c Context) ClassicErrorHandler() internal.ErrorHandlerFunc {
 
 		// render error page
 		w.WriteHeader(statusCode)
-		c.Renderer().Render(w, classic_pages.Error{
+		c.Render(w, classic_pages.Error{
 			Title: msg,
 		})
 	}

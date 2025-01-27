@@ -13,6 +13,7 @@ import (
 func (c Context) Api(mux internal.Mux) {
 	mux = internal.Fallback(mux, c.ApiErrorHandler())
 
+	mux.Handle("", internal.ErrorHandler(mux, httperrors.New("api routes", http.StatusOK)))
 	mux.Handle("/", internal.ErrorHandler(mux, httperrors.New("route not found", http.StatusNotFound)))
 }
 

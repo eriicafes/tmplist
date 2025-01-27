@@ -1,2 +1,6 @@
 @import "tailwindcss";
 @source "../../templates/**/*.{html,go}";
+
+@theme {
+  --font-inter: "Inter", var(--font-sans);
+}

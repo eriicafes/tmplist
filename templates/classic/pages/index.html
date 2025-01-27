@@ -6,12 +6,26 @@
 
 {{ define "content" }}
 <section>
-    <div class="mb-4 h-7 flex items-center justify-between flex-wrap leading-none">
+    <div class="mb-4 h-7 flex items-center justify-between leading-none">
         <h2 class="text-xl font-medium">Your Topics</h2>
         <p class="text-zinc-300 text-sm">{{ .Layout.User.Email }}</p>
     </div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-8">
+    <form {{if .Search}}data-show{{end}} class="group flex items-center justify-end gap-1">
+        <input name="search" type="text" placeholder="Search topics" value="{{.Search}}"
+            class="invisible group-data-show:visible sm:max-w-80 flex-1 px-4 h-8 text-xs rounded-full border border-zinc-700 focus:border-zinc-600 focus:outline-none">
+        <button type="button" onclick="this.parentElement.toggleAttribute('data-show')"
+            class="rounded-full text-zinc-400 hover:text-zinc-200 transition-colors">
+            <span class="hidden group-data-show:inline">
+                {{ template "components/icons/x" map "class" "size-5 stroke-[1.5]" }}
+            </span>
+            <span class="group-data-show:hidden">
+                {{ template "components/icons/search" map "class" "size-5 stroke-[1.5]" }}
+            </span>
+        </button>
+    </form>
+
+    <div class="py-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 md:gap-6">
         <button
             id="new-topic-trigger"
             type="button"

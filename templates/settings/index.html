@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="{{ vite_public "/vite.svg" }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <title>Welcome to Tmplist</title>
+    {{ vite }}
+    <link rel="stylesheet" href="{{ vite_asset "src/main.css" }}">
+</head>
+
+<body class="bg-zinc-800 text-white font-inter">
+    <main class="mt-12 py-8 max-w-4xl mx-auto px-4">
+        <h1 class="mb-6 text-3xl font-bold">Welcome to Tmplist</h1>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 items-center justify-between">
+            {{ template "mode-item" map
+                "href" "/classic"
+                "title" "Classic"
+                "desc" "Tmpl + Vite"
+                "image" "/go.png"
+                "class" "col-span-full sm:col-span-1"
+            }}
+            {{ template "mode-item" map
+                "href" "/enhanced"
+                "title" "Enhanced"
+                "desc" "Tmpl Streaming + HTMX + Vite"
+                "image" "/htmx.png"
+            }}
+            {{ template "mode-item" map
+                "href" "/spa"
+                "title" "SPA"
+                "desc" "REST API + React + Vite"
+                "image" "/react.png"
+                "imageClass" "sm:h-16"
+            }}
+        </div>
+    </main>
+</body>
+
+</html>
+
+{{ define "mode-item" }}
+<a href="{{ .href }}" class="{{ clsx .class "group flex flex-col justify-between gap-2 p-2.5 rounded-2xl aspect-square bg-zinc-700 border border-zinc-700 hover:border-zinc-600 transition-colors" }}">
+    <div class="flex-1 flex items-center justify-center">
+        <img 
+            src="{{ .image }}" 
+            alt="{{ .title }}" 
+            class="{{ clsx .imageClass "h-12 object-contain group-hover:scale-105 transition-transform ease-out duration-300" }}">
+    </div>
+    <div class="grid gap-1 sm:gap-2">
+        <p class="text-lg sm:text-xl line-clamp-2">{{ .title }}</p>
+        <p class="text-[10px] text-zinc-300 line-clamp-1">{{ .desc }}</p>
+    </div>
+</a>
+{{ end }}

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"html/template"
 	"os"
 
 	"github.com/eriicafes/tmpl"
@@ -16,12 +15,10 @@ func setupTemplates(dev bool) (tmpl.Templates, *vite.Vite) {
 	if err != nil {
 		panic(err)
 	}
-	funcMap := template.FuncMap{
-		"vite_is_dev": func() bool { return v.Dev },
-	}
 	tp := tmpl.New(os.DirFS("templates")).
-		Funcs(v.Funcs(), funcMap).
+		Funcs(v.Funcs()).
 		Autoload("components").
+		Load("settings/index").
 		Load("spa/index").
 		LoadTree("classic/pages").
 		LoadTree("enhanced/pages").

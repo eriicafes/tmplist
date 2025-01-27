@@ -1,6 +1,10 @@
 package classic_pages
 
-import "github.com/eriicafes/tmplist/db"
+import (
+	"html/template"
+
+	"github.com/eriicafes/tmplist/db"
+)
 
 type toastType string
 
@@ -16,7 +20,8 @@ type Toast struct {
 }
 
 type Layout struct {
-	Toast Toast
-	Title string
-	User  *db.User
+	Toast    Toast
+	Title    string
+	User     *db.User
+	Children func() (template.HTML, error)
 }

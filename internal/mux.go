@@ -15,3 +15,14 @@ type Mux interface {
 	ServeMux
 	Route(pattern string, handler func(http.ResponseWriter, *http.Request) error)
 }
+
+func New() Mux {
+	return Use(http.NewServeMux())
+}
+
+func MuxHandler(mux Mux) http.Handler {
+	if h, ok := mux.(http.Handler); ok {
+		return h
+	}
+	return nil
+}

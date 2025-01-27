@@ -19,16 +19,17 @@ func (t Topic) FormatCreatedAt() string {
 	return t.CreatedAt.Format("Jan _2, 2006")
 }
 
-func (d DB) GetTopics(userId int) ([]Topic, error) {
+func (d DB) GetTopics(userId int, search string) ([]Topic, error) {
 	var topics []Topic
+
 	err := d.db.Select(&topics, `
 	select topics.*, count(todos.topic_id) as todos_count
 	from topics
 	left join todos on todos.topic_id = topics.id
-	where user_id = $1
+	where topics.user_id = $1 and topics.title ilike '%' || $2 || '%'
 	group by topics.id
 	order by topics.id desc
-	`, userId)
+	`, userId, search)
 	return topics, err
 }
 
