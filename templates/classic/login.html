@@ -1,0 +1,39 @@
+<section class="max-w-xl mx-auto text-sm">
+    <div class="mb-4">
+        <p class="text-2xl font-medium mb-2">Login your account</p>
+        <p class="font-light">Enter email address and password to login your account.</p>
+    </div>
+
+    <form method="post" class="grid gap-4">
+        <div class="grid gap-1">
+            <label class="text-zinc-500 px-1">Email</label>
+            <input required type="text" name="email" placeholder="Your email address" value="{{ .Form.Email }}"
+                class="border h-12 w-full rounded-md px-3 bg-transparent border-zinc-700 focus:border-zinc-400 focus:outline-none">
+            {{ if .Errors.Email }}
+            <p class="text-xs text-red-400 px-1">{{ .Errors.Email }}</p>
+            {{ end }}
+        </div>
+
+        <div class="grid gap-1">
+            <label class="text-zinc-500 px-1">Password</label>
+            <input required type="password" name="password" placeholder="Your password"
+                class="border h-12 w-full rounded-md px-3 bg-transparent border-zinc-700 focus:border-zinc-400 focus:outline-none">
+            {{ if .Errors.Password }}
+            <p class="text-xs text-red-400 px-1">{{ .Errors.Password }}</p>
+            {{ end }}
+        </div>
+
+        {{ if .Error }}
+        {{ template "components/toast" map "message" .Error "type" "error" }}
+        {{ end }}
+
+        <div class="grid pt-4 border-t border-zinc-700">
+            <button class="bg-sky-200 text-zinc-800 font-semibold h-12 rounded-md">Log In</button>
+        </div>
+
+        <p class="text-center">
+            Don't have an account yet?
+            <a href="/classic/register" class="font-medium underline">Register</a>
+        </p>
+    </form>
+</section>

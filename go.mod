@@ -3,7 +3,7 @@ module github.com/eriicafes/tmplist
 go 1.23.4
 
 require (
-	github.com/eriicafes/tmpl v0.8.0
+	github.com/eriicafes/tmpl v0.12.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/joho/godotenv v1.5.1

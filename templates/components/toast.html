@@ -1,14 +1,14 @@
-{{ $class := clsx "flex gap-1 border p-3 rounded-lg"
+{{ $class := clsx "flex gap-1 border p-3 rounded-lg mb-4"
  (eq .type "warning") "bg-yellow-100 text-yellow-600 border-yellow-400"
  (eq .type "error") "bg-red-100 text-red-500 border-red-300"
  (eq .type "success") "bg-teal-100 text-teal-600 border-teal-400"
  (not (eq .type "warning" "error" "success")) "bg-zinc-100 text-zinc-600 border-zinc-400"
  .class
 }}
-<div class="{{$class}}">
+<div id="toast" {{if .swap}} hx-swap-oob="true" {{end}} class="{{$class}}">
     {{ template "components/icons/info-circled" map "class" "size-4 shrink-0" }}
     <p class="flex-1 text-xs">{{ .message }}</p>
-    <button class="shrink-0" type="button" onclick="this.parentElement.remove()">
+    <button class="shrink-0" type="button" onclick="this.parentElement.classList='hidden';this.parentElement.innerHTML=''">
         {{ template "components/icons/x" map "class" "size-4" }}
     </button>
 </div>

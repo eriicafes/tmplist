@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="{{ vite_public "/vite.svg" }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <title>
+        {{ with .Title }}
+        {{ printf "%s | " . }}
+        {{ end }}
+        Tmplist
+    </title>
+    {{ vite "src/classic/index.ts" }}
+    {{ vite_css "src/main.css" }}
+    {{ block "script" .}}{{ end }}
+    <script type="module">
+        function getCookieValue(name) {
+            const match = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')
+            return match?.pop()
+        }
+        const settingsForm = document.querySelector("#settings-dialog")
+        settingsForm.querySelector("[name=mode]").value = getCookieValue("mode")
+    </script>
+</head>
+
+<body class="bg-zinc-800 text-white font-inter">
+    <header class="fixed top-0 inset-x-0 z-50 bg-zinc-800 border-b border-zinc-900">
+        <div class="flex items-center justify-between px-4 py-2">
+            <div class="flex items-center gap-1">
+                <a href="/classic" class="font-semibold tracking-wide text-lg">
+                    Tmplist
+                </a>
+                <a href="/" class="border rounded-full px-2 py-px text-[9px] uppercase" type="button">
+                    Classic
+                </a>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button id="settings-trigger" class="flex items-center justify-center gap-1 bg-zinc-700 text-zinc-400 w-8 h-8 sm:w-auto sm:px-4 text-xs font-medium rounded-full">
+                    {{ template "components/icons/gear" map "class" "size-5"}}
+                    <span class="hidden sm:inline">Settings</span>
+                </button>
+                {{ if .User }}
+                <form action="/classic/logout" method="post">
+                    <button class="flex items-center justify-center gap-1 bg-sky-200 text-zinc-800 w-8 h-8 sm:w-auto sm:px-4 text-xs font-medium rounded-full">
+                        {{ template "components/icons/exit" map "class" "size-5 stroke-[1.5]"}}
+                        <span class="hidden sm:inline">Logout</span>
+                    </button>
+                </form>
+                {{ else }}
+                <a href="/classic/login">
+                    <button class="flex items-center justify-center gap-1 bg-sky-200 text-zinc-800 w-8 h-8 sm:w-auto sm:px-4 text-xs font-medium rounded-full">
+                        {{ template "components/icons/plus" map "class" "size-5"}}
+                        <span class="hidden sm:inline">Login</span>
+                    </button>
+                </a>
+                {{ end }}
+            </div>
+        </div>
+    </header>
+
+    <main class="mt-12 py-8 max-w-4xl mx-auto px-4">
+        {{ if .Toast.Message }}
+            {{ template "components/toast" map "message" .Toast.Message "type" .Toast.Type }}
+        {{ end }}
+
+        {{ slot .Children }}
+    </main>
+
+    <div id="portal">
+        {{ block "portal" .}}{{ end }}
+    
+        <div id="settings-dialog" class="hidden data-open:block absolute w-80 max-w-[calc(100vw-72px)] translate-y-2 shadow-xl bg-zinc-700 rounded-3xl p-4">
+            <div class="mb-4 flex items-center justify-between">
+                <h3 class="font-semibold text-lg">Settings</h3>
+                <button data-role="close">
+                    {{ template "components/icons/x" map "class" "size-5 stroke-1"}}
+                </button>
+            </div>
+            <form method="post" action="/" class="grid gap-4">
+                <div class="grid gap-1">
+                    <label class="font-medium text-zinc-400 text-[10px]">Mode</label>
+                    <div class="rounded-xl border border-zinc-600 focus-within:border-zinc-400 px-2">
+                        <select name="mode" class="w-full text-xs bg-transparent h-9 focus:outline-none">
+                            <option value="none">None</option>
+                            <option value="classic">Classic</option>
+                            <option value="enhanced">Enhanced</option>
+                            <option value="spa">SPA</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="flex items-center justify-center gap-1 bg-sky-200 text-zinc-800 h-9 text-xs font-medium rounded-full">Save</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

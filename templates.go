@@ -18,10 +18,10 @@ func setupTemplates(dev bool) (tmpl.Templates, *vite.Vite) {
 	tp := tmpl.New(os.DirFS("templates")).
 		Funcs(v.Funcs()).
 		Autoload("components").
-		Load("settings/index").
+		Load("index").
 		Load("spa/index").
-		LoadTree("classic/pages").
-		LoadTree("enhanced/pages").
+		LoadTree("classic").
+		LoadTree("enhanced").
 		MustParse()
 
 	return tp, v

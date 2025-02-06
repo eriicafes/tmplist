@@ -23,15 +23,8 @@ func main() {
 		Auth:      auth,
 		Prod:      config.Prod,
 	}
-
 	mux := http.NewServeMux()
-	rc.Settings(mux)
-	// mount mode routes under prefixes
-	rc.Classic(internal.Prefix(mux, "/classic"))
-	rc.Enhanced(internal.Prefix(mux, "/enhanced"))
-	rc.Spa(internal.Prefix(mux, "/spa"))
-	rc.Api(internal.Prefix(mux, "/api"))
-
+	rc.Mount(mux)
 	// serve vite static assets
 	mux.Handle("/", vite.ServePublic(http.NotFoundHandler()))
 

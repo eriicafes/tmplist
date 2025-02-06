@@ -30,6 +30,10 @@ func (pm *prefixMux) HandleFunc(pattern string, handler func(http.ResponseWriter
 	pm.ServeMux.HandleFunc(pm.prefixPattern(pattern), handler)
 }
 
+func (pm *prefixMux) HandleError(w http.ResponseWriter, r *http.Request, err error) {
+	ErrorHandler(pm.ServeMux, err)(w, r)
+}
+
 func (pm *prefixMux) Route(pattern string, handler func(http.ResponseWriter, *http.Request) error) {
 	pm.Handle(pattern, withErrorHandler(pm, handler))
 }

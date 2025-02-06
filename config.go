@@ -20,19 +20,22 @@ func (c Config) ListenAddr() string {
 }
 
 func getConfig() Config {
-	prod := flag.Bool("prod", false, "production mode")
-	port := flag.String("port", "8000", "application port")
+	dev := flag.Bool("dev", false, "development mode")
 	flag.Parse()
 
 	if err := godotenv.Load(); err != nil {
 		panic(fmt.Errorf("failed to load .env: %w", err))
 	}
-	dbUrl := os.Getenv("POSTGRES_DB_URL")
+	port := "8000"
+	if envport, ok := os.LookupEnv("port"); ok {
+		port = envport
+	}
 	secret := os.Getenv("SECRET_KEY")
+	dbUrl := os.Getenv("POSTGRES_DB_URL")
 
 	return Config{
-		Prod:   *prod,
-		Port:   *port,
+		Prod:   !*dev,
+		Port:   port,
 		DbURL:  dbUrl,
 		Secret: secret,
 	}

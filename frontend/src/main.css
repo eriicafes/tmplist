@@ -1,6 +1,12 @@
 @import "tailwindcss";
 @source "../../templates/**/*.{html,go}";
 
-@theme {
+@theme inline {
   --font-inter: "Inter", var(--font-sans);
+}
+
+@layer base {
+  button {
+    cursor: pointer;
+  }
 }

@@ -9,9 +9,9 @@ import (
 
 func (c Context) Spa(mux internal.Mux) {
 	mux.HandleFunc("", func(w http.ResponseWriter, r *http.Request) {
-		c.Render(w, tmpl.Tmpl("spa/index"))
+		c.Render(w, tmpl.Tmpl("spa/index", nil))
 	})
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		c.Render(w, tmpl.Tmpl("spa/index"))
+		c.Render(w, tmpl.Tmpl("spa/index", nil))
 	})
 }

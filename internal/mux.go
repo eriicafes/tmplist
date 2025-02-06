@@ -10,7 +10,8 @@ type ServeMux interface {
 	HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request))
 }
 
-// Mux is a specialized mux that can register routes with handlers that return an error.
+// Mux is a specialized mux that has a Route method.
+// The Route method registers routes with handlers that return an error
 type Mux interface {
 	ServeMux
 	Route(pattern string, handler func(http.ResponseWriter, *http.Request) error)

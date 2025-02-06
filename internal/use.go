@@ -27,6 +27,10 @@ func (am *useMux) HandleFunc(pattern string, handler func(http.ResponseWriter, *
 	am.Handle(pattern, http.HandlerFunc(handler))
 }
 
+func (fm *useMux) HandleError(w http.ResponseWriter, r *http.Request, err error) {
+	ErrorHandler(fm.ServeMux, err)(w, r)
+}
+
 func (am *useMux) Route(pattern string, handler func(http.ResponseWriter, *http.Request) error) {
 	am.Handle(pattern, withErrorHandler(am, handler))
 }

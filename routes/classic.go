@@ -13,15 +13,15 @@ import (
 	"github.com/eriicafes/tmplist/internal/httperrors"
 	"github.com/eriicafes/tmplist/internal/session"
 	"github.com/eriicafes/tmplist/schemas"
-	classic_pages "github.com/eriicafes/tmplist/templates/classic/pages"
+	"github.com/eriicafes/tmplist/templates/classic"
 )
 
 func (c Context) Classic(mux internal.Mux) {
 	mux = internal.Fallback(mux, c.ClassicErrorHandler())
-	auth := internal.Use(mux, c.authMiddleware())
-	guest := internal.Use(mux, c.guestMiddleware())
+	auth := internal.Use(mux, c.authMiddleware("/classic/login"))
+	guest := internal.Use(mux, c.guestMiddleware("/classic"))
 
-	toastMessage := session.NewFlash[classic_pages.Toast](session.FlashOptions{
+	toastMessage := session.NewFlash[classic.Toast](session.FlashOptions{
 		Cookie: "toast_message",
 		Secure: c.Prod,
 		Path:   "/",
@@ -40,8 +40,8 @@ func (c Context) Classic(mux internal.Mux) {
 		// get topics from db
 		topics, _ := c.DB.GetTopics(user.Id, search)
 
-		return c.Render(w, classic_pages.Index{
-			Layout: classic_pages.Layout{
+		return c.Render(w, classic.Index{
+			Layout: classic.Layout{
 				Toast: toastMessage.Get(w, r),
 				Title: "Topics",
 				User:  &user,
@@ -56,9 +56,9 @@ func (c Context) Classic(mux internal.Mux) {
 		user, _ := requestUser.Get(r.Context())
 
 		renderError := func(message string) error {
-			toastMessage.Set(w, classic_pages.Toast{
+			toastMessage.Set(w, classic.Toast{
 				Message: message,
-				Type:    classic_pages.ToastError,
+				Type:    classic.ToastError,
 			})
 			http.Redirect(w, r, "/classic", http.StatusFound)
 			return nil
@@ -108,11 +108,8 @@ func (c Context) Classic(mux internal.Mux) {
 			}
 		}
 
-		// set flash message and redirect
-		toastMessage.Set(w, classic_pages.Toast{
-			Message: "Topic created",
-		})
-		http.Redirect(w, r, "/classic", http.StatusFound)
+		// redirect to topic page
+		http.Redirect(w, r, fmt.Sprintf("/classic/%d", topic.Id), http.StatusFound)
 		return nil
 	})
 
@@ -133,8 +130,8 @@ func (c Context) Classic(mux internal.Mux) {
 			log.Println(err)
 		}
 
-		return c.Render(w, classic_pages.Topic{
-			Layout: classic_pages.Layout{
+		return c.Render(w, classic.Topic{
+			Layout: classic.Layout{
 				Toast: toastMessage.Get(w, r),
 				Title: topic.Title,
 				User:  &user,
@@ -151,9 +148,9 @@ func (c Context) Classic(mux internal.Mux) {
 		topicId, _ := strconv.Atoi(r.PathValue("topicId"))
 
 		renderError := func(message string) error {
-			toastMessage.Set(w, classic_pages.Toast{
+			toastMessage.Set(w, classic.Toast{
 				Message: message,
-				Type:    classic_pages.ToastError,
+				Type:    classic.ToastError,
 			})
 			http.Redirect(w, r, fmt.Sprintf("/classic/%d", topicId), http.StatusFound)
 			return nil
@@ -191,9 +188,9 @@ func (c Context) Classic(mux internal.Mux) {
 		topicId, _ := strconv.Atoi(r.PathValue("topicId"))
 
 		renderError := func(message string) error {
-			toastMessage.Set(w, classic_pages.Toast{
+			toastMessage.Set(w, classic.Toast{
 				Message: message,
-				Type:    classic_pages.ToastError,
+				Type:    classic.ToastError,
 			})
 			http.Redirect(w, r, fmt.Sprintf("/classic/%d", topicId), http.StatusFound)
 			return nil
@@ -213,7 +210,7 @@ func (c Context) Classic(mux internal.Mux) {
 		}
 
 		// set flash message and redirect
-		toastMessage.Set(w, classic_pages.Toast{
+		toastMessage.Set(w, classic.Toast{
 			Message: "Topic deleted",
 		})
 		http.Redirect(w, r, "/classic", http.StatusFound)
@@ -226,9 +223,9 @@ func (c Context) Classic(mux internal.Mux) {
 		topicId, _ := strconv.Atoi(r.PathValue("topicId"))
 
 		renderError := func(message string) error {
-			toastMessage.Set(w, classic_pages.Toast{
+			toastMessage.Set(w, classic.Toast{
 				Message: message,
-				Type:    classic_pages.ToastError,
+				Type:    classic.ToastError,
 			})
 			http.Redirect(w, r, fmt.Sprintf("/classic/%d", topicId), http.StatusFound)
 			return nil
@@ -237,7 +234,6 @@ func (c Context) Classic(mux internal.Mux) {
 		// check if topic exists and belongs to user
 		topic, err := c.DB.GetTopic(topicId)
 		if err != nil || topic.UserId != user.Id {
-			log.Println(err)
 			return renderError("Topic not found")
 		}
 
@@ -268,9 +264,9 @@ func (c Context) Classic(mux internal.Mux) {
 		todoId, _ := strconv.Atoi(r.PathValue("todoId"))
 
 		renderError := func(message string) error {
-			toastMessage.Set(w, classic_pages.Toast{
+			toastMessage.Set(w, classic.Toast{
 				Message: message,
-				Type:    classic_pages.ToastError,
+				Type:    classic.ToastError,
 			})
 			http.Redirect(w, r, fmt.Sprintf("/classic/%d", topicId), http.StatusFound)
 			return nil
@@ -318,9 +314,9 @@ func (c Context) Classic(mux internal.Mux) {
 		todoId, _ := strconv.Atoi(r.PathValue("todoId"))
 
 		renderError := func(message string) error {
-			toastMessage.Set(w, classic_pages.Toast{
+			toastMessage.Set(w, classic.Toast{
 				Message: message,
-				Type:    classic_pages.ToastError,
+				Type:    classic.ToastError,
 			})
 			http.Redirect(w, r, fmt.Sprintf("/classic/%d", topicId), http.StatusFound)
 			return nil
@@ -351,8 +347,8 @@ func (c Context) Classic(mux internal.Mux) {
 
 	// login page
 	guest.Route("GET /login", func(w http.ResponseWriter, r *http.Request) error {
-		return c.Render(w, classic_pages.Login{
-			Layout: classic_pages.Layout{
+		return c.Render(w, classic.Login{
+			Layout: classic.Layout{
 				Title: "Login",
 			},
 		})
@@ -371,8 +367,8 @@ func (c Context) Classic(mux internal.Mux) {
 			Password: r.PostFormValue("password"),
 		}
 		renderError := func(message string, details httperrors.Details) error {
-			return c.Render(w, classic_pages.Login{
-				Layout: classic_pages.Layout{
+			return c.Render(w, classic.Login{
+				Layout: classic.Layout{
 					Title: "Login",
 				},
 				Form:   form,
@@ -392,13 +388,7 @@ func (c Context) Classic(mux internal.Mux) {
 		}
 		// check password
 		if !c.Auth.ComparePassword(user.PasswordHash, form.Password) {
-			return c.Render(w, classic_pages.Login{
-				Layout: classic_pages.Layout{
-					Title: "Login",
-				},
-				Form:  form,
-				Error: "Invalid password",
-			})
+			return renderError("Invalid password", nil)
 		}
 		// create session and set cookie
 		token, err := c.Auth.GenerateSessionToken()
@@ -418,8 +408,8 @@ func (c Context) Classic(mux internal.Mux) {
 
 	// register page
 	guest.Route("GET /register", func(w http.ResponseWriter, r *http.Request) error {
-		return c.Render(w, classic_pages.Register{
-			Layout: classic_pages.Layout{
+		return c.Render(w, classic.Register{
+			Layout: classic.Layout{
 				Title: "Register",
 			},
 		})
@@ -438,8 +428,9 @@ func (c Context) Classic(mux internal.Mux) {
 			Password: r.PostFormValue("password"),
 		}
 		renderError := func(message string, details httperrors.Details) error {
-			return c.Render(w, classic_pages.Register{
-				Layout: classic_pages.Layout{
+			w.WriteHeader(http.StatusBadRequest)
+			return c.Render(w, classic.Register{
+				Layout: classic.Layout{
 					Title: "Login",
 				},
 				Form:   form,
@@ -478,14 +469,15 @@ func (c Context) Classic(mux internal.Mux) {
 		c.Auth.SetCookie(w, token, session.ExpiresAt)
 
 		// set flash message and redirect to authenticated page
-		toastMessage.Set(w, classic_pages.Toast{
+		toastMessage.Set(w, classic.Toast{
 			Message: "Account created successfully",
-			Type:    classic_pages.ToastSuccess,
+			Type:    classic.ToastSuccess,
 		})
 		http.Redirect(w, r, "/classic", http.StatusFound)
 		return nil
 	})
 
+	// logout
 	auth.Route("POST /logout", func(w http.ResponseWriter, r *http.Request) error {
 		session, _ := requestSession.Get(r.Context())
 		if err := c.Auth.InvalidateSession(session.Id); err != nil {
@@ -505,13 +497,12 @@ func (c Context) ClassicErrorHandler() internal.ErrorHandlerFunc {
 		var herr httperrors.HTTPError
 		if !errors.As(err, &herr) {
 			log.Println("Unexpected error:", err)
-			herr = httperrors.New("Something went wrong", http.StatusInternalServerError)
+			return
 		}
 		statusCode, msg, _ := herr.HTTPError()
-
 		// render error page
 		w.WriteHeader(statusCode)
-		c.Render(w, classic_pages.Error{
+		c.Render(w, classic.Error{
 			Title: msg,
 		})
 	}

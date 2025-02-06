@@ -10,8 +10,9 @@ export default defineConfig({
     rollupOptions: {
       input: [
         "src/main.css",
-        "src/react/index.tsx",
-        ...globSync(["src/vanilla/index.ts", "src/vanilla/**/*.ts"]),
+        "src/spa/index.tsx",
+        ...globSync("src/classic/**/*.ts"),
+        ...globSync("src/enhanced/**/*.ts"),
       ],
     },
   },

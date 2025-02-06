@@ -1,0 +1,81 @@
+{{ define "script"}}
+    {{ vite_script "src/classic/pages/index.ts"}}
+{{ end }}
+
+<section>
+    <div class="mb-4 h-7 flex items-center justify-between leading-none">
+        <h2 class="text-xl font-medium">Your Topics</h2>
+        <p class="text-zinc-300 text-sm">{{ .User.Email }}</p>
+    </div>
+
+    <form {{if .Search}}data-show{{end}} class="group flex items-center justify-end gap-1">
+        <input name="search" type="text" placeholder="Search topics" value="{{.Search}}"
+            class="invisible group-data-show:visible sm:max-w-80 flex-1 px-4 h-8 text-xs rounded-full border border-zinc-700 focus:border-zinc-600 focus:outline-none">
+        <button type="button" onclick="this.parentElement.toggleAttribute('data-show')"
+            class="rounded-full text-zinc-400 hover:text-zinc-200 transition-colors">
+            <span class="hidden group-data-show:inline">
+                {{ template "components/icons/x" map "class" "size-5 stroke-[1.5]" }}
+            </span>
+            <span class="group-data-show:hidden">
+                {{ template "components/icons/search" map "class" "size-5 stroke-[1.5]" }}
+            </span>
+        </button>
+    </form>
+
+    <div class="py-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 md:gap-6">
+        <button
+            id="new-topic-trigger"
+            type="button"
+            class="flex flex-col items-center justify-center gap-2 p-2.5 rounded-2xl aspect-square border border-zinc-700 hover:border-zinc-600 hover:bg-zinc-700/20 text-zinc-400 hover:text-zinc-100 transition-colors">
+            {{ template "components/icons/plus" map "class" "size-7" }}
+            <span class="select-none text-sm font-medium">New Topic</span>
+        </button>
+
+        {{ range .Topics }}
+        <a href="/classic/{{.Id}}" class="flex flex-col justify-between gap-2 p-2.5 rounded-2xl aspect-square border border-zinc-700 bg-zinc-700 hover:scale-[1.02] transition-transform">
+            <div class="flex items-center justify-between">
+                <div class="size-5 rounded-full bg-linear-60 {{ $.Gradient .Id }}"></div>
+                {{ template "components/icons/ellipsis-vertical" map "class" "size-4 text-zinc-400" }}
+            </div>
+            <div class="grid gap-3">
+                <p class="text-lg line-clamp-2">{{ .Title }}</p>
+                <p class="text-[10px] text-zinc-300">{{ .FormatCreatedAt }} • {{ .TodosCount }} item{{if ne .TodosCount 1}}s{{end}}</p>
+            </div>
+        </a>
+        {{ end }}
+
+        {{ range .EmptyCells }}
+        <div class="flex flex-col justify-between gap-2 p-2.5 rounded-2xl aspect-square border border-zinc-700/30 bg-zinc-700/30"></div>
+        {{ end }}
+    </div>
+</section>
+
+{{ define "portal"}}
+<div id="new-topic-overlay" class="hidden data-open:block fixed inset-0 bg-transparent data-open:bg-black/30 transition-colors duration-300"></div>
+<div id="new-topic-dialog" class="hidden data-open:block fixed inset-x-0 top-[20vh] w-full max-w-[90vw] sm:max-w-xl mx-auto shadow-xl bg-zinc-800 border border-zinc-700 rounded-xl p-4">
+    <form id="topic-form" method="post" class="grid">
+        <div class="flex items-start gap-1">
+            <input name="topic" required type="text" placeholder="Enter topic..." class="flex-1 px-2 h-12 focus:outline-none text-lg font-medium">
+            <button type="button" data-role="close" class="p-1 mt-2 rounded-full text-zinc-400 hover:text-zinc-100 transition-colors">
+                {{ template "components/icons/x" map "class" "size-5 stroke-1" }} 
+            </button>
+        </div>
+        <fieldset class="max-h-100 overflow-y-scroll">
+            <div class="flex items-center gap-1 text-sm text-zinc-400 border-b border-transparent focus-within:border-zinc-700 transition-colors">
+                <label for="new-todo-input">
+                    {{ template "components/icons/plus" map "class" "size-5 stroke-2" }}
+                </label>
+                <input id="new-todo-input" type="text" placeholder="New todo item" class="flex-1 px-2 h-10 focus:outline-none">
+            </div>
+            <div id="new-todos"></div>
+            <div id="completed-todos" label="Completed todos" class="mt-4 pt-4 border-t border-zinc-700 not-empty:before:content-[attr(label)] before:text-zinc-500 before:text-xs before:block before:pb-2"></div>
+        </fieldset>
+        <div class="flex justify-end mt-2">
+            <button type="submit" class="flex items-center justify-center gap-1 bg-sky-200 text-zinc-800 h-9 px-4 text-xs font-medium rounded-xl">
+                Add Topic
+            </button>
+        </div>
+    </form>
+</div>
+<template id="new-todo-input-template">{{ template "components/todo-item" }}</template>
+{{ end }}
