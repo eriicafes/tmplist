@@ -22,10 +22,8 @@ func (c Config) ListenAddr() string {
 func getConfig() Config {
 	dev := flag.Bool("dev", false, "development mode")
 	flag.Parse()
+	godotenv.Load()
 
-	if err := godotenv.Load(); err != nil {
-		panic(fmt.Errorf("failed to load .env: %w", err))
-	}
 	port := "8000"
 	if envport, ok := os.LookupEnv("port"); ok {
 		port = envport
