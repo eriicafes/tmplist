@@ -22,7 +22,7 @@
                     <label for="new-todo-input">
                         {{ template "components/icons/plus" map "class" "size-5 stroke-2" }}
                     </label>
-                    <input name="todo" required type="text" {{if not .LastUpdatedId}}autofocus{{end}} placeholder="New todo item" class="flex-1 px-2 h-10 focus:outline-none">
+                    <input id="new-todo-input" name="todo" required type="text" {{if not .LastUpdatedId}}autofocus{{end}} placeholder="New todo item" class="flex-1 px-2 h-10 focus:outline-none">
                 </form>
                 <div>
                     {{- range .PendingTodos -}}
@@ -31,7 +31,7 @@
                     </form>
                     {{- end -}}
                 </div>
-                <div label="Completed todos" class="mt-4 pt-4 border-t border-zinc-700 not-empty:before:content-[attr(label)] before:text-zinc-500 before:text-xs before:block before:pb-2">
+                <div data-label="Completed todos" class="mt-4 pt-4 border-t border-zinc-700 not-empty:before:content-[attr(data-label)] before:text-zinc-500 before:text-xs before:block before:pb-2">
                     {{- range .CompletedTodos }}
                     <form method="post" action="/classic/{{.TopicId}}/todos/{{.Id}}">
                         {{ template "components/todo-item" map "value" .Body "checked" .Done "autofocus" (eq $.LastUpdatedId .Id) "deleteAction" (printf "/classic/%d/todos/%d/delete" .TopicId .Id) }}

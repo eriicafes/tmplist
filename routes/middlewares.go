@@ -7,18 +7,18 @@ import (
 	"github.com/eriicafes/tmplist/internal"
 )
 
-func (c Context) authMiddleware(redirectTo string) internal.Middleware {
+func (c Context) authMiddleware(onNotAllowed func(w http.ResponseWriter, r *http.Request)) internal.Middleware {
 	return func(handler http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// prevent non safe cross-subdomain requests
 			if !c.allowOriginForNonSafeRequests(r) {
-				http.Redirect(w, r, redirectTo, http.StatusFound)
+				onNotAllowed(w, r)
 				return
 			}
 
 			session, user, ok := c.Auth.Authenticate(w, r)
 			if !ok {
-				http.Redirect(w, r, redirectTo, http.StatusFound)
+				onNotAllowed(w, r)
 				return
 			}
 			ctx := requestSession.Set(r.Context(), session)
@@ -28,12 +28,12 @@ func (c Context) authMiddleware(redirectTo string) internal.Middleware {
 	}
 }
 
-func (c Context) guestMiddleware(redirectTo string) internal.Middleware {
+func (c Context) guestMiddleware(onNotAllowed func(w http.ResponseWriter, r *http.Request)) internal.Middleware {
 	return func(handler http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			_, _, ok := c.Auth.Authenticate(w, r)
 			if ok {
-				http.Redirect(w, r, redirectTo, http.StatusFound)
+				onNotAllowed(w, r)
 				return
 			}
 			handler.ServeHTTP(w, r)

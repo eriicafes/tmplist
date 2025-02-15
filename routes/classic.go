@@ -18,8 +18,12 @@ import (
 
 func (c Context) Classic(mux internal.Mux) {
 	mux = internal.Fallback(mux, c.ClassicErrorHandler())
-	auth := internal.Use(mux, c.authMiddleware("/classic/login"))
-	guest := internal.Use(mux, c.guestMiddleware("/classic"))
+	auth := internal.Use(mux, c.authMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/classic/login", http.StatusFound)
+	}))
+	guest := internal.Use(mux, c.guestMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/classic", http.StatusFound)
+	}))
 
 	toastMessage := session.NewFlash[classic.Toast](session.FlashOptions{
 		Cookie: "toast_message",
@@ -85,7 +89,7 @@ func (c Context) Classic(mux internal.Mux) {
 			return renderError("Invalid input")
 		}
 
-		// add topic to db
+		// insert topic in db
 		topic, err := c.DB.InsertTopic(user.Id, form.Topic)
 		if err != nil {
 			log.Println(err)
@@ -100,7 +104,7 @@ func (c Context) Classic(mux internal.Mux) {
 					Done:    v.Checked,
 				})
 			}
-			// add topic todos to db
+			// insert topic todos in db
 			_, err = c.DB.InsertTodos(insertTodos)
 			if err != nil {
 				log.Println(err)
@@ -121,7 +125,6 @@ func (c Context) Classic(mux internal.Mux) {
 		// check if topic exists and belongs to user
 		topic, err := c.DB.GetTopic(topicId)
 		if err != nil || topic.UserId != user.Id {
-			log.Println(err)
 			return httperrors.New("Topic not found", http.StatusNotFound)
 		}
 		// get todos for topic
@@ -159,7 +162,6 @@ func (c Context) Classic(mux internal.Mux) {
 		// check if topic exists and belongs to user
 		topic, err := c.DB.GetTopic(topicId)
 		if err != nil || topic.UserId != user.Id {
-			log.Println(err)
 			return renderError("Topic not found")
 		}
 
@@ -172,7 +174,7 @@ func (c Context) Classic(mux internal.Mux) {
 			return renderError("Invalid input")
 		}
 
-		// update todo in db
+		// update topic in db
 		if _, err = c.DB.UpdateTopic(topic.Id, form.Topic); err != nil {
 			log.Println(err)
 			return renderError("Failed to update topic")
@@ -199,11 +201,10 @@ func (c Context) Classic(mux internal.Mux) {
 		// check if topic exists and belongs to user
 		topic, err := c.DB.GetTopic(topicId)
 		if err != nil || topic.UserId != user.Id {
-			log.Println(err)
 			return renderError("Topic not found")
 		}
 
-		// delete todo from db
+		// delete topic from db
 		if err = c.DB.DeleteTopic(topic.Id); err != nil {
 			log.Println(err)
 			return renderError("Failed to delete topic")
@@ -246,7 +247,7 @@ func (c Context) Classic(mux internal.Mux) {
 			return renderError("Invalid input")
 		}
 
-		// update todo in db
+		// insert todo in db
 		insertTodos := []db.Todo{{TopicId: topic.Id, Body: form.Text}}
 		if _, err = c.DB.InsertTodos(insertTodos); err != nil {
 			log.Println(err)
@@ -275,13 +276,11 @@ func (c Context) Classic(mux internal.Mux) {
 		// check if topic exists and belongs to user
 		topic, err := c.DB.GetTopic(topicId)
 		if err != nil || topic.UserId != user.Id {
-			log.Println(err)
 			return renderError("Topic not found")
 		}
 		// check if todo exists and belongs to topic
 		todo, err := c.DB.GetTodo(todoId)
 		if err != nil || todo.TopicId != topic.Id {
-			log.Println(err)
 			return renderError("Todo not found")
 		}
 
@@ -325,17 +324,15 @@ func (c Context) Classic(mux internal.Mux) {
 		// check if topic exists and belongs to user
 		topic, err := c.DB.GetTopic(topicId)
 		if err != nil || topic.UserId != user.Id {
-			log.Println(err)
 			return renderError("Topic not found")
 		}
 		// check if todo exists and belongs to topic
 		todo, err := c.DB.GetTodo(todoId)
 		if err != nil || todo.TopicId != topic.Id {
-			log.Println(err)
 			return renderError("Todo not found")
 		}
 
-		// update todo in db
+		// delete todo from db
 		if err = c.DB.DeleteTodo(todo.Id); err != nil {
 			log.Println(err)
 			return renderError("Failed to delete todo")
@@ -451,11 +448,10 @@ func (c Context) Classic(mux internal.Mux) {
 		// insert user in db
 		user, err := c.DB.InsertUser(form.Email, passwordHash)
 		if err != nil {
-			msg := "Failed to create account"
 			if err == db.ErrDuplicate {
-				msg = "Email address already taken"
+				return renderError("Email address already taken", nil)
 			}
-			return renderError(msg, nil)
+			return renderError("Failed to create account", nil)
 		}
 		// create session and set cookie
 		token, err := c.Auth.GenerateSessionToken()

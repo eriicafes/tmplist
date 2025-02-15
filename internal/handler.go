@@ -17,6 +17,29 @@ type HandleError interface {
 	HandleError(http.ResponseWriter, *http.Request, error)
 }
 
+type withRequest struct{ *http.Request }
+
+func (r withRequest) Error() string { return "" }
+
+func WithRequest(r *http.Request) error { return withRequest{r} }
+
+func routeErrorHandler(mux ServeMux, handlers []func(http.ResponseWriter, *http.Request) error) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var err error
+		for _, handler := range handlers {
+			err = handler(w, r)
+			if wr, ok := err.(withRequest); ok {
+				r = wr.Request
+				continue
+			}
+			if err != nil {
+				ErrorHandler(mux, err)(w, r)
+				break
+			}
+		}
+	}
+}
+
 // ErrorHandler returns the error handler func for mux.
 // If mux does not implement the HandleError interface the returned handler func will write a default error response.
 func ErrorHandler(mux ServeMux, err error) http.HandlerFunc {
@@ -26,13 +49,5 @@ func ErrorHandler(mux ServeMux, err error) http.HandlerFunc {
 			return
 		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
-
-func withErrorHandler(mux ServeMux, handler HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if err := handler(w, r); err != nil {
-			ErrorHandler(mux, err)(w, r)
-		}
 	}
 }

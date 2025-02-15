@@ -5,11 +5,11 @@ import (
 )
 
 type Todo struct {
-	Id        int       `db:"id"`
-	TopicId   int       `db:"topic_id"`
-	Body      string    `db:"body"`
-	Done      bool      `db:"done"`
-	CreatedAt time.Time `db:"created_at"`
+	Id        int       `db:"id" json:"id"`
+	TopicId   int       `db:"topic_id" json:"topic_id"`
+	Body      string    `db:"body" json:"body"`
+	Done      bool      `db:"done" json:"done"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
 }
 
 func (d DB) GetTodos(topicId int) ([]Todo, error) {

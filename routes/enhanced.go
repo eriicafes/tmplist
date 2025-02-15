@@ -18,8 +18,12 @@ import (
 
 func (c Context) Enhanced(mux internal.Mux) {
 	mux = internal.Fallback(mux, c.EnhancedErrorHandler())
-	auth := internal.Use(mux, c.authMiddleware("/enhanced/login"))
-	guest := internal.Use(mux, c.guestMiddleware("/enhanced"))
+	auth := internal.Use(mux, c.authMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/enhanced/login", http.StatusFound)
+	}))
+	guest := internal.Use(mux, c.guestMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/enhanced", http.StatusFound)
+	}))
 
 	toastMessage := session.NewFlash[enhanced.Toast](session.FlashOptions{
 		Cookie: "toast_message",
@@ -458,11 +462,10 @@ func (c Context) Enhanced(mux internal.Mux) {
 		// insert user in db
 		user, err := c.DB.InsertUser(form.Email, passwordHash)
 		if err != nil {
-			msg := "Failed to create account"
 			if err == db.ErrDuplicate {
-				msg = "Email address already taken"
+				return renderError("Email address already taken", nil)
 			}
-			return renderError(msg, nil)
+			return renderError("Failed to create account", nil)
 		}
 		// create session and set cookie
 		token, err := c.Auth.GenerateSessionToken()

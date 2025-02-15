@@ -7,9 +7,9 @@ import (
 )
 
 type Session struct {
-	Id        string    `db:"id"`
-	UserId    int       `db:"user_id"`
-	ExpiresAt time.Time `db:"expires_at"`
+	Id        string    `db:"id" json:"id"`
+	UserId    int       `db:"user_id" json:"user_id"`
+	ExpiresAt time.Time `db:"expires_at" json:"expires_at"`
 }
 
 func (s Session) GetExpirestAt() time.Time {

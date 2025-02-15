@@ -5,14 +5,14 @@ import (
 )
 
 type Topic struct {
-	Id        int       `db:"id"`
-	UserId    int       `db:"user_id"`
-	Title     string    `db:"title"`
-	CreatedAt time.Time `db:"created_at"`
+	Id        int       `db:"id" json:"id"`
+	UserId    int       `db:"user_id" json:"user_id"`
+	Title     string    `db:"title" json:"title"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
 
 	// Aggregated fields
 
-	TodosCount int `db:"todos_count"`
+	TodosCount int `db:"todos_count" json:"todos_count"`
 }
 
 func (t Topic) FormatCreatedAt() string {

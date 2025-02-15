@@ -6,8 +6,8 @@ import (
 )
 
 type LoginData struct {
-	Email    string
-	Password string
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 func (d LoginData) Validate() error {
@@ -18,8 +18,8 @@ func (d LoginData) Validate() error {
 }
 
 type RegisterData struct {
-	Email    string
-	Password string
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 func (d RegisterData) Validate() error {

@@ -16,6 +16,6 @@ func (fm *fallbackMux) HandleError(w http.ResponseWriter, r *http.Request, err e
 	fm.errorHandler(w, r, err)
 }
 
-func (fm *fallbackMux) Route(pattern string, handler func(http.ResponseWriter, *http.Request) error) {
-	fm.Handle(pattern, withErrorHandler(fm, handler))
+func (fm *fallbackMux) Route(pattern string, handlers ...func(http.ResponseWriter, *http.Request) error) {
+	fm.Handle(pattern, routeErrorHandler(fm, handlers))
 }

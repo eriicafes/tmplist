@@ -7,16 +7,19 @@ import (
 
 type HTTPError interface {
 	error
-	Unwrap() error
 	HTTPError() (statusCode int, message string, details Details)
 }
 
 type Details = map[string]string
 
 // New returns a new HTTPError with status code.
-// The error message is set to the msg string.
 func New(msg string, statusCode int) HTTPError {
 	return &httpError{errors.New(msg), statusCode, nil}
+}
+
+// NewDetails returns a new HTTPError with status code and details.
+func NewDetails(msg string, statusCode int, details Details) HTTPError {
+	return &httpError{errors.New(msg), statusCode, details}
 }
 
 // Wrap wraps an error into an HTTPError with status code.
@@ -27,10 +30,10 @@ func Wrap(err error, statusCode int) HTTPError {
 	if herr, ok := err.(HTTPError); ok {
 		_, _, details = herr.HTTPError()
 	}
-	return WrapDetails(err, statusCode, details)
+	return &httpError{err, statusCode, details}
 }
 
-// WrapDetails wraps an error into an HTTPError with statusCode and details.
+// WrapDetails wraps an error into an HTTPError with status code and details.
 // The error message is set to the wrapped error's error message.
 func WrapDetails(err error, statusCode int, details Details) HTTPError {
 	return &httpError{err, statusCode, details}

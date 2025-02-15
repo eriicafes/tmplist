@@ -35,7 +35,7 @@
                 <label for="new-todo-input">
                     {{ template "components/icons/plus" map "class" "size-5 stroke-2" }}
                 </label>
-                <input data-input-id="todo" name="todo" required type="text" autofocus placeholder="New todo item" class="flex-1 px-2 h-10 focus:outline-none">
+                <input id="new-todo-input" data-input-id="todo" name="todo" required type="text" autofocus placeholder="New todo item" class="flex-1 px-2 h-10 focus:outline-none">
             </form>
             {{ block "todos" .Todos }}
             <div id="todos">
@@ -55,7 +55,7 @@
                     </form>
                     {{- end -}}
                 </div>
-                <div id="completed-todos" label="Completed todos" class="mt-4 pt-4 border-t border-zinc-700 not-empty:before:content-[attr(label)] before:text-zinc-500 before:text-xs before:block before:pb-2">
+                <div id="completed-todos" data-label="Completed todos" class="mt-4 pt-4 border-t border-zinc-700 not-empty:before:content-[attr(data-label)] before:text-zinc-500 before:text-xs before:block before:pb-2">
                     {{- range .CompletedTodos }}
                     <form 
                         hx-put="/enhanced/{{.TopicId}}/todos/{{.Id}}"

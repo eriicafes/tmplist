@@ -19,6 +19,7 @@ htmx.on("htmx:afterRequest", () => {
 const showNewTopicDialog = $state(false);
 
 const newTopicTrigger = $onMount(() => {
+  // refs
   const newTopicTrigger = $ref<HTMLButtonElement>("#new-topic-trigger")!;
 
   // toggle new topic dialog

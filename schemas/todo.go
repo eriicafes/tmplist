@@ -5,8 +5,8 @@ import (
 )
 
 type TopicData struct {
-	Topic string
-	Todos []TodoData
+	Topic string     `json:"topic"`
+	Todos []TodoData `json:"todos"`
 }
 
 func (d TopicData) Validate() error {
@@ -17,8 +17,8 @@ func (d TopicData) Validate() error {
 }
 
 type TodoData struct {
-	Text    string
-	Checked bool
+	Text    string `json:"text"`
+	Checked bool   `json:"checked"`
 }
 
 func (d TodoData) Validate() error {
