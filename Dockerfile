@@ -9,9 +9,9 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o bin/app
 # run migrations
 RUN go install github.com/pressly/goose/v3/cmd/goose@v3.24.0
-ARG POSTGRES_DB_URL
+ARG GOOSE_DBSTRING
+ENV GOOSE_DRIVER="$GOOSE_DBSTRING"
 ENV GOOSE_DRIVER="postgres"
-ENV GOOSE_DBSTRING="$POSTGRES_DB_URL"
 ENV GOOSE_MIGRATION_DIR="./migrations"
 RUN goose up
 
