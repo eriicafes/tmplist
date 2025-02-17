@@ -40,6 +40,7 @@ export function TodoItem(props: {
       />
       <button
         onClick={props.onDelete}
+        type="button"
         className="rounded-full p-1 hidden group-focus-within:block hover:bg-zinc-700 hover:text-zinc-300 transition-colors"
       >
         <XIcon className="size-4 stroke-1" />

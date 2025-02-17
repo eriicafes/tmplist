@@ -7,6 +7,7 @@ $onMount(() => {
 
   // refs
   const newTopicTrigger = $ref<HTMLButtonElement>("#new-topic-trigger")!;
+  const newTopicClose = $ref<HTMLDivElement>("#new-topic-close")!;
   const newTopicDialog = $ref<HTMLDivElement>("#new-topic-dialog")!;
   const newTopicOverlay = $ref<HTMLDivElement>("#new-topic-overlay")!;
 
@@ -15,12 +16,9 @@ $onMount(() => {
     showNewTopicDialog.set((prev) => !prev);
   });
 
-  // close new topic dialog from within
-  newTopicDialog.addEventListener("click", (e) => {
-    const target = e.target as HTMLElement | null;
-    if (target?.dataset.role === "close") {
-      showNewTopicDialog.set(false);
-    }
+  // close new topic dialog
+  newTopicClose.addEventListener("click", () => {
+    showNewTopicDialog.set(false);
   });
 
   // close new topic dialog on overlay click
@@ -113,6 +111,17 @@ $onMount(() => {
       } else {
         newTodos.insertAdjacentElement("beforeend", todoItem);
       }
+    }
+  });
+
+  // remove todo
+  topicForm.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+    const todoItemRemove = target.closest(
+      "[data-role=remove][data-target=todo-item]"
+    );
+    if (todoItemRemove) {
+      todoItemRemove.closest("div.group")!.remove();
     }
   });
 });

@@ -56,7 +56,7 @@
     <form id="topic-form" method="post" class="grid">
         <div class="flex items-start gap-1">
             <input name="topic" required type="text" placeholder="Enter topic..." class="flex-1 px-2 h-12 focus:outline-none text-lg font-medium">
-            <button type="button" data-role="close" class="p-1 mt-2 rounded-full text-zinc-400 hover:text-zinc-100 transition-colors">
+            <button type="button" id="new-topic-close" class="p-1 mt-2 rounded-full text-zinc-400 hover:text-zinc-100 transition-colors">
                 {{ template "components/icons/x" map "class" "size-5 stroke-1" }} 
             </button>
         </div>

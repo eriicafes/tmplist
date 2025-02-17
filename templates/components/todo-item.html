@@ -8,7 +8,9 @@
         {{if .deleteAction}} 
             formaction="{{.deleteAction}}" 
         {{else}} 
-            type="button" 
+            type="button"
+            data-role="remove"
+            data-target="todo-item"
         {{end}}
         {{if .hxDeleteAction}} 
             hx-delete="{{.hxDeleteAction}}"
