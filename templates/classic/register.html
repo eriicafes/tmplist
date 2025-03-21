@@ -9,8 +9,8 @@
             <label class="text-zinc-500 px-1">Email</label>
             <input type="email" name="email" placeholder="Your email address" value="{{ .Form.Email }}"
                 class="border h-12 w-full rounded-md px-3 bg-transparent border-zinc-700 focus:border-zinc-400 focus:outline-none">
-            {{ if .Errors.Email }}
-            <p class="text-red-500 px-1">{{ .Errors.Email }}</p>
+            {{ if .Errors.email }}
+            <p class="text-red-500 px-1">{{ .Errors.email }}</p>
             {{ end }}
         </div>
 
@@ -18,8 +18,8 @@
             <label class="text-zinc-500 px-1">Password</label>
             <input type="password" name="password" placeholder="Your password"
                 class="border h-12 w-full rounded-md px-3 bg-transparent border-zinc-700 focus:border-zinc-400 focus:outline-none">
-            {{ if .Errors.Password }}
-            <p class="text-red-500 px-1">{{ .Errors.Password }}</p>
+            {{ if .Errors.password }}
+            <p class="text-red-500 px-1">{{ .Errors.password }}</p>
             {{ end }}
         </div>
 
