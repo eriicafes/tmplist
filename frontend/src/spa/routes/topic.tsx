@@ -1,5 +1,5 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { PlusIcon, TrashIcon } from "lucide-react";
+import { PlusIcon, Trash2Icon } from "lucide-react";
 import { useRef } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { mutations, queries } from "../api";
@@ -20,6 +20,7 @@ export default function Topic() {
   const newTodoInputRef = useRef<HTMLInputElement>(null);
 
   const handleDelete = () => {
+    if (!confirm("Are you sure you want to delete this topic?")) return;
     deleteTopic.mutate(
       {
         topicId: topic.data.topic.id,
@@ -83,7 +84,7 @@ export default function Topic() {
               type="button"
               className="p-1 mt-2 rounded-full text-zinc-400 hover:text-zinc-100 transition-colors"
             >
-              <TrashIcon className="size-5 stroke-1" />
+              <Trash2Icon className="size-5 stroke-1" />
             </button>
           </div>
           <div>
